@@ -47,8 +47,8 @@ const college = {
                         },
                         {
                             sem: 5,
-                            class_subjects: ["Subject5", "Subject6"],
-                            lab_subjects: ["LabSubject5", "LabSubject6"]
+                            class_subjects: ["TCS", "SE", "CG", "DLCOA", "PCE-2"],
+                            lab_subjects: ["SE", "CG", "DLCOA", "PCE-2"]
                         },
                         {
                             sem: 7,
@@ -88,7 +88,7 @@ const college = {
                     sem: "Odd",
                     sem_wise_details: [
                         {
-                            sem: 1,
+                            sem: 5,
                             no_of_students: 180,
                             no_of_divisions: 3,
                             divisions: [
@@ -96,77 +96,31 @@ const college = {
                                     division: "1",
                                     no_of_students: 76,
                                     time_per_day: [
-                                        {
-                                            Day: "Monday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        },
-                                        {
-                                            Day: "Tuesday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        },
-                                        {
-                                            Day: "Wednesday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        },
-                                        {
-                                            Day: "Thursday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        },
-                                        {
-                                            Day: "Friday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        },
-
+                                        { Day: "Monday", timing: "9 to 4", total_hours: 7 },
+                                        { Day: "Tuesday", timing: "9 to 4", total_hours: 7 },
+                                        { Day: "Wednesday", timing: "9 to 4", total_hours: 7 },
+                                        { Day: "Thursday", timing: "9 to 4", total_hours: 7 },
+                                        { Day: "Friday", timing: "9 to 4", total_hours: 7 }
                                     ],
                                     no_of_batches: 4,
                                     batches: [
-                                        {
-                                            batch_no: 'A',
-                                            no_of_students: 20
-                                        },
-                                        {
-                                            batch_no: 'B',
-                                            no_of_students: 20
-                                        },
-                                        {
-                                            batch_no: 'C',
-                                            no_of_students: 20
-                                        },
-                                        {
-                                            batch_no: 'D',
-                                            no_of_students: 16
-                                        },
+                                        { batch_no: "A", no_of_students: 20 },
+                                        { batch_no: "B", no_of_students: 20 },
+                                        { batch_no: "C", no_of_students: 20 },
+                                        { batch_no: "D", no_of_students: 16 }
                                     ]
                                 },
                                 {
                                     division: "2",
                                     no_of_students: 30,
                                     time_per_day: [
-                                        {
-                                            Day: "Tuesday",
-                                            timing: "9 to 4",
-                                            total_hours: 7
-                                        }
+                                        { Day: "Tuesday", timing: "9 to 4", total_hours: 7 }
                                     ],
                                     no_of_batches: 3,
                                     batches: [
-                                        {
-                                            batch_no: 1,
-                                            no_of_students: 10
-                                        },
-                                        {
-                                            batch_no: 2,
-                                            no_of_students: 10
-                                        },
-                                        {
-                                            batch_no: 3,
-                                            no_of_students: 10
-                                        }
+                                        { batch_no: 1, no_of_students: 10 },
+                                        { batch_no: 2, no_of_students: 10 },
+                                        { batch_no: 3, no_of_students: 10 }
                                     ]
                                 }
                             ]
@@ -187,14 +141,29 @@ const college = {
             ],
             faculties: [
                 {
-                    faculty_name: "Faculty1",
-                    teaching_subjects: ["Subject1", "Subject2"],
-                    availability: ["Wednesday", "Friday"]
+                    faculty_name: "Dr.Dinesh Patil",
+                    teaching_subjects: ["OS", "SE"],
+                    availability: ["Monday", "Wednesday", "Friday"]
                 },
                 {
-                    faculty_name: "Faculty2",
-                    teaching_subjects: ["Subject3", "Subject4"],
-                    availability: ["Monday", "Wednesday", "Friday"]
+                    faculty_name: "Dr.Priti Rumao",
+                    teaching_subjects: ["TCS", "CP"],
+                    availability: ["Monday", "Wednesday", "Thursday"]
+                },
+                {
+                    faculty_name: "Dr.Swapna Borde",
+                    teaching_subjects: ["DLCOA", "AOA"],
+                    availability: ["Tuesday", "Wednesday", "Friday"]
+                },
+                {
+                    faculty_name: "Dr.Sonia Khatu",
+                    teaching_subjects: ["MP", "CG"],
+                    availability: ["Monday", "Tuesday", "Thursday"]
+                },
+                {
+                    faculty_name: "Dr.Smita Jawale",
+                    teaching_subjects: ["DBMS", "ADBMS"],
+                    availability: ["Monday", "Thursday", "Friday"]
                 }
             ]
         }

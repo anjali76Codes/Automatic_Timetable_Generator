@@ -1,79 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timetable</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Faculty Timetable</title>
     <style>
-        .timetable {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 1rem;
-            margin: 1rem;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
         }
-        .cell {
-            border: 1px solid #ddd;
-            padding: 1rem;
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
             text-align: center;
-            background-color: #f9f9f9;
-            font-weight: bold;
         }
-        .cell.null {
-            background-color: transparent;
+
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        td {
+            background-color: white;
+        }
+
+        td.null {
+            background-color: #f9f9f9;
+        }
+
+        .subject-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .subject-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .teacher-name {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .timetable {
+            margin-top: 20px;
+            border-spacing: 0;
+        }
+
+        .empty-cell {
+            background-color: #f4f4f9;
+        }
+
+        .slot-time {
+            font-weight: bold;
+            color: #4a90e2;
         }
     </style>
 </head>
-<body class="bg-gray-100">
 
-    <div class="container mx-auto">
-        <h1 class="text-3xl text-center my-6">Faculty Timetable</h1>
-        
-        <div id="timetable" class="timetable">
-            <!-- Timetable cells will be inserted here dynamically -->
-        </div>
+<body>
+    <div class="container">
+        <h1>Faculty Timetable</h1>
+        <table id="timetable" class="timetable">
+            <thead>
+                <tr>
+                    <th>Day/Time</th>
+                    <th>9:00 AM - 10:00 AM</th>
+                    <th>10:00 AM - 11:00 AM</th>
+                    <th>11:00 AM - 11:15 AM</th>
+                    <th>11:15 AM - 12:15 PM</th>
+                    <th>12:15 PM - 1:15 PM</th>
+                    <th>1:15 PM - 2:00 PM</th>
+                    <th>2:00 PM - 3:00 PM</th>
+                    <th>3:00 PM - 4:00 PM</th>
+                    <th>4:00 PM - 5:00 PM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Timetable rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        const matrix = [
-            // Example matrix data based on your logic, replace this with actual generated matrix
-            [
-                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
-                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
-            ],
-            [
-                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
-                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
-            ],
-            [
-                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
-                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
-            ],
-            [
-                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
-                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
-            ],
-            [
-                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
-                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
-            ]
-        ];
-
-        const timetableContainer = document.getElementById('timetable');
-
-        matrix.forEach(row => {
-            row.forEach(cell => {
-                const cellElement = document.createElement('div');
-                cellElement.classList.add('cell');
-                if (!cell[0]) {
-                    cellElement.classList.add('null');
-                } else {
-                    cellElement.innerHTML = `<strong>${cell[0]}</strong><br><span>${cell[1]}</span>`;
-                }
-                timetableContainer.appendChild(cellElement);
-            });
-        });
-    </script>
-
+    <!-- Link to the external JavaScript file -->
+    <script src="timetable_matrix.js"></script>
 </body>
+
 </html>
