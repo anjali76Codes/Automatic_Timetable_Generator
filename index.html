@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .timetable {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 1rem;
+            margin: 1rem;
+        }
+        .cell {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        .cell.null {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto">
+        <h1 class="text-3xl text-center my-6">Faculty Timetable</h1>
+        
+        <div id="timetable" class="timetable">
+            <!-- Timetable cells will be inserted here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        const matrix = [
+            // Example matrix data based on your logic, replace this with actual generated matrix
+            [
+                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
+                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
+            ],
+            [
+                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
+                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
+            ],
+            [
+                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
+                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
+            ],
+            [
+                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
+                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
+            ],
+            [
+                ['CN', 'Dr.Sonia Khatu'], [null, null], ['SE', 'Dr.Dinesh Patil'], ['TCS', 'Dr.Priti Rumao'], [null, null], ['DLCOA', 'Dr.Swapna Borde'],
+                ['PCE-2', 'Dr.Aashi Cynth'], ['MP', 'Dr.Sonia Khatu'], ['DBMS', 'Dr.Smita Jawale']
+            ]
+        ];
+
+        const timetableContainer = document.getElementById('timetable');
+
+        matrix.forEach(row => {
+            row.forEach(cell => {
+                const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
+                if (!cell[0]) {
+                    cellElement.classList.add('null');
+                } else {
+                    cellElement.innerHTML = `<strong>${cell[0]}</strong><br><span>${cell[1]}</span>`;
+                }
+                timetableContainer.appendChild(cellElement);
+            });
+        });
+    </script>
+
+</body>
+</html>
