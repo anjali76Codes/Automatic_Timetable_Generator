@@ -48,8 +48,8 @@
                 },
                 {
                   "sem": 5,
-                  "class_subjects": ["Subject5", "Subject6"],
-                  "lab_subjects": ["LabSubject5", "LabSubject6"]
+                  "class_subjects": ["TCS","SE" ,"CG" , "DLCOA", "PCE-2"],
+                  "lab_subjects": ["SE", "CG" , "DLCOA" , "PCE-2"]
                 },
                 {
                   "sem": 7,
@@ -89,7 +89,7 @@
               "sem": "Odd",
               "sem_wise_details": [
                 {
-                  "sem": 1,
+                  "sem": 5,
                   "no_of_students": 180,
                   "no_of_divisions": 3,
                   "divisions": [
@@ -187,14 +187,29 @@
           ],
           "faculties": [
             {
-              "faculty_name": "Faculty1",
-              "teaching_subjects": ["Subject1", "Subject2"],
-              "availability": ["Wednesday", "Friday"]
+              "faculty_name": "Dr.Dinesh Patil",
+              "teaching_subjects": ["OS", "SE"],
+              "availability": ["Monday" , "Wednesday", "Friday" ]
             },
             {
-              "faculty_name": "Faculty2",
-              "teaching_subjects": ["Subject3", "Subject4"],
-              "availability": ["Monday", "Wednesday", "Friday"]
+              "faculty_name": "Dr.Priti Rumao",
+              "teaching_subjects": ["TCS", "CP"],
+              "availability": ["Monday", "Wednesday", "Thursday"]
+            },
+            {
+              "faculty_name": "Dr.Swapna Borde",
+              "teaching_subjects": ["DLCOA", "AOA" ],
+              "availability": ["Tuesday", "Wednesday", "Friday"]
+            },
+            {
+              "faculty_name": "Dr.Sonia Khatu",
+              "teaching_subjects": ["MP", "CG" ],
+              "availability": ["Monday", "Tuesday", "Thursday"]
+            },
+            {
+              "faculty_name": "Dr.Smita Jawale",
+              "teaching_subjects": ["DBMS", "ADBMS" ],
+              "availability": ["Monday", "Thursday", "Friday"]
             }
           ]
         }
