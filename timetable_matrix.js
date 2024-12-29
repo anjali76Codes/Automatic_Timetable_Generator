@@ -27,6 +27,14 @@ const rows = daysOfWeek.length;
 const columns = 9; // 9 periods: 8 for subjects and 1 for break
 const matrix = [];
 
+// Subject assignment count
+const subjectCount = {};
+
+// Initialize counts for all subjects
+[...subjects, ...lab_subjects].forEach(subject => {
+    subjectCount[subject] = 0;
+});
+
 let assignedLabSubjects = []; // To track which lab subjects have been assigned
 
 for (let i = 0; i < rows; i++) {
@@ -41,14 +49,13 @@ for (let i = 0; i < rows; i++) {
     // Assign a different lab subject for each day
     let labSubjectForDay;
     if (assignedLabSubjects.length < lab_subjects.length) {
-        // Ensure a different lab subject for each day
         do {
             labSubjectForDay = lab_subjects[Math.floor(Math.random() * lab_subjects.length)];
-        } while (assignedLabSubjects.includes(labSubjectForDay));
+        } while (assignedLabSubjects.includes(labSubjectForDay) || subjectCount[labSubjectForDay] >= 3);
 
         assignedLabSubjects.push(labSubjectForDay);
     } else {
-        // Once all lab subjects are assigned, keep using them cyclically (or can add fallback logic)
+        // Once all lab subjects are assigned, keep using them cyclically
         labSubjectForDay = lab_subjects[i % lab_subjects.length];
     }
 
@@ -60,6 +67,7 @@ for (let i = 0; i < rows; i++) {
             row[firstSlot] = [labSubjectForDay, subjectToFacultyMap[labSubjectForDay]];
             row[firstSlot + 1] = [labSubjectForDay, subjectToFacultyMap[labSubjectForDay]];
             rowUsedSubjects.add(labSubjectForDay);
+            subjectCount[labSubjectForDay] += 2;
             labPlaced = true;
             break;
         }
@@ -83,10 +91,19 @@ for (let i = 0; i < rows; i++) {
                         console.warn('Max attempts reached for subject assignment, skipping this subject.');
                         break; // Prevent infinite loop
                     }
-                } while (rowUsedSubjects.has(subject) || lab_subjects.includes(subject));
+                } while (
+                    rowUsedSubjects.has(subject) ||
+                    lab_subjects.includes(subject) ||
+                    subjectCount[subject] >= 3
+                );
 
-                row.push([subject, subjectToFacultyMap[subject]]);
-                rowUsedSubjects.add(subject);
+                if (subject && subjectCount[subject] < 3) {
+                    row.push([subject, subjectToFacultyMap[subject]]);
+                    rowUsedSubjects.add(subject);
+                    subjectCount[subject]++;
+                } else {
+                    row.push([null, null]); // If no valid subject, leave blank
+                }
             }
         }
     }
