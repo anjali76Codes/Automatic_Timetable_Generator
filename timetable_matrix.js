@@ -1,16 +1,19 @@
-// Adjusted timetable generation logic to ensure unique subjects and handle two-hour subjects
+// Subject lists and teacher data
 const subjects = ['CN', 'DLCOA', 'ADBMS', 'SE', 'TCS', 'PCE-2'];
+const lab_subjects = ['L-CN', 'L-DLCOA', 'L-SE', 'L-PCE-2'];
 const teachers = ['Priti Rumao', 'Dr.Dinesh Patil', 'Smita Jawale', 'Soniya Khatu', 'Swapna Borde', 'Dr.Aashi Cynth'];
 
+// Faculty data
 const faculties = [
-    { faculty_name: "Dr.Dinesh Patil", teaching_subjects: ["OS", "SE"] },
-    { faculty_name: "Dr.Priti Rumao", teaching_subjects: ["TCS", "CP"] },
-    { faculty_name: "Dr.Swapna Borde", teaching_subjects: ["DLCOA", "AOA"] },
-    { faculty_name: "Dr.Sonia Khatu", teaching_subjects: ["MP", "CG", "CN"] },
+    { faculty_name: "Dr.Dinesh Patil", teaching_subjects: ["OS", "SE", 'L-SE'] },
+    { faculty_name: "Dr.Priti Rumao", teaching_subjects: ["TCS", "CP", 'L-CN'] },
+    { faculty_name: "Dr.Swapna Borde", teaching_subjects: ["DLCOA", "AOA", 'L-DLCOA'] },
+    { faculty_name: "Dr.Sonia Khatu", teaching_subjects: ["MP", "CG", "CN", 'L-CN'] },
     { faculty_name: "Dr.Smita Jawale", teaching_subjects: ["DBMS", "ADBMS"] },
-    { faculty_name: "Dr.Aashi Cynth", teaching_subjects: ["PCE-2"] }
+    { faculty_name: "Dr.Aashi Cynth", teaching_subjects: ["PCE-2", 'L-PCE-2'] }
 ];
 
+// Mapping subjects to teachers
 const subjectToFacultyMap = {};
 faculties.forEach(faculty => {
     faculty.teaching_subjects.forEach(subject => {
@@ -18,10 +21,13 @@ faculties.forEach(faculty => {
     });
 });
 
+// Day and period setup
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const rows = daysOfWeek.length;
-const columns = 9;
+const columns = 9; // 9 periods: 8 for subjects and 1 for break
 const matrix = [];
+
+let assignedLabSubjects = []; // To track which lab subjects have been assigned
 
 for (let i = 0; i < rows; i++) {
     const row = [];
@@ -30,42 +36,54 @@ for (let i = 0; i < rows; i++) {
 
     let subjectIndex = 0;
     const rowUsedSubjects = new Set();
+    const availableSlots = [0, 1, 3, 4, 6, 7, 8]; // Exclude the break slot (2 and 5)
 
-    const subjectToRepeat = shuffledSubjects[Math.floor(Math.random() * shuffledSubjects.length)];
-    let repeatedSubjectPlaced = false;
+    // Assign a different lab subject for each day
+    let labSubjectForDay;
+    if (assignedLabSubjects.length < lab_subjects.length) {
+        // Ensure a different lab subject for each day
+        do {
+            labSubjectForDay = lab_subjects[Math.floor(Math.random() * lab_subjects.length)];
+        } while (assignedLabSubjects.includes(labSubjectForDay));
 
-    const availableSlots = [0, 1, 3, 4, 6, 7, 8];
-    let consecutiveSlots = [];
+        assignedLabSubjects.push(labSubjectForDay);
+    } else {
+        // Once all lab subjects are assigned, keep using them cyclically (or can add fallback logic)
+        labSubjectForDay = lab_subjects[i % lab_subjects.length];
+    }
 
-    while (consecutiveSlots.length === 0) {
-        const randomSlotIndex = Math.floor(Math.random() * availableSlots.length);
-        const firstSlot = availableSlots[randomSlotIndex];
-
-        if (availableSlots.includes(firstSlot + 1)) {
-            consecutiveSlots = [firstSlot, firstSlot + 1];
-        } else {
-            availableSlots.splice(randomSlotIndex, 1);
+    // Try to place the lab subject in consecutive periods
+    let labPlaced = false;
+    for (let j = 0; j < availableSlots.length - 1; j++) {
+        const firstSlot = availableSlots[j];
+        if (availableSlots.includes(firstSlot + 1) && !labPlaced) {
+            row[firstSlot] = [labSubjectForDay, subjectToFacultyMap[labSubjectForDay]];
+            row[firstSlot + 1] = [labSubjectForDay, subjectToFacultyMap[labSubjectForDay]];
+            rowUsedSubjects.add(labSubjectForDay);
+            labPlaced = true;
+            break;
         }
     }
 
+    // Assign the remaining subjects to the row
     for (let j = 0; j < columns; j++) {
         if (j === 2 || j === 5) {
+            // Empty slots for breaks (skip period 2 and 5)
             row.push([null, null]);
         } else {
-            if (!repeatedSubjectPlaced && consecutiveSlots.includes(j)) {
-                row.push([subjectToRepeat, subjectToFacultyMap[subjectToRepeat]]);
-                if (consecutiveSlots[0] === j) {
-                    j++; // Skip the next slot for the repeated subject
-                    row.push([subjectToRepeat, subjectToFacultyMap[subjectToRepeat]]);
-                }
-                rowUsedSubjects.add(subjectToRepeat);
-                repeatedSubjectPlaced = true;
-            } else {
+            // If the slot is empty, assign a non-lab subject
+            if (!row[j]) {
                 let subject;
+                let attempts = 0;
                 do {
                     subject = shuffledSubjects[subjectIndex % shuffledSubjects.length];
                     subjectIndex++;
-                } while (rowUsedSubjects.has(subject) || subject === subjectToRepeat);
+                    attempts++;
+                    if (attempts > 50) {
+                        console.warn('Max attempts reached for subject assignment, skipping this subject.');
+                        break; // Prevent infinite loop
+                    }
+                } while (rowUsedSubjects.has(subject) || lab_subjects.includes(subject));
 
                 row.push([subject, subjectToFacultyMap[subject]]);
                 rowUsedSubjects.add(subject);
@@ -76,11 +94,12 @@ for (let i = 0; i < rows; i++) {
     matrix.push(row);
 }
 
+// Function to generate the timetable table
 const timetableBody = document.querySelector('#timetable tbody');
 matrix.forEach((row, rowIndex) => {
     const tr = document.createElement('tr');
 
-    // Create the first cell for the day
+    // Day column
     const dayCell = document.createElement('td');
     dayCell.textContent = daysOfWeek[rowIndex];
     tr.appendChild(dayCell);
@@ -90,7 +109,7 @@ matrix.forEach((row, rowIndex) => {
         const [currentSubject, currentTeacher] = row[colIndex];
 
         if (currentSubject === null) {
-            // Handle empty cells
+            // Handle empty cells (breaks)
             const emptyCell = document.createElement('td');
             emptyCell.classList.add('empty-cell');
             tr.appendChild(emptyCell);
@@ -138,10 +157,10 @@ matrix.forEach((row, rowIndex) => {
     timetableBody.appendChild(tr);
 });
 
-
+// Function to shuffle array
 function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
     }
 }
