@@ -43,14 +43,14 @@ function assignRoom(isLab) {
     }
 }
 
-// Function to generate timetable for a given division
+// Function to generate a timetable for a division
 function generateTimetableForDivision(division) {
     const matrix = [];
     const subjectCounts = {}; // Track the count of each subject
     subjects.forEach(subject => (subjectCounts[subject] = 0));
 
     for (let i = 0; i < daysOfWeek.length; i++) {
-        const row = [];
+        const row = new Array(columns).fill([null, null, null]);
         const shuffledSubjects = [...subjects];
         shuffleArray(shuffledSubjects);
 
@@ -79,43 +79,45 @@ function generateTimetableForDivision(division) {
             }
         }
 
-        for (let j = 0; j < columns; j++) {
-            if (j === 2 || j === 5) {
-                row.push([null, null, null]); // Breaks (no subject, no teacher, no room)
-            } else if (consecutiveSlots.includes(j)) {
-                // Assign lab subject to consecutive slots
-                const room = assignRoom(true);
-                row.push([labSubject, labTeacher, room]);
-                if (consecutiveSlots[0] === j) {
-                    j++; // Skip the next slot
-                    row.push([labSubject, labTeacher, room]);
-                }
-                rowUsedSubjects.add(labSubject);
-            } else {
-                // Assign a unique non-lab subject
-                let subject;
-                let attempts = 0;
-                do {
-                    subject = shuffledSubjects[subjectIndex % shuffledSubjects.length];
-                    subjectIndex++;
-                    attempts++;
-                    if (attempts > subjects.length) {
-                        break; // Avoid infinite loop if no valid subject is found
-                    }
-                } while (
-                    rowUsedSubjects.has(subject) ||
-                    subject === labSubject ||
-                    subjectCounts[subject] >= 3
-                );
+        // Assign lab subject to consecutive slots
+        const labRoom = assignRoom(true);
+        row[consecutiveSlots[0]] = [labSubject, labTeacher, labRoom];
+        row[consecutiveSlots[1]] = [labSubject, labTeacher, labRoom];
+        rowUsedSubjects.add(labSubject);
 
-                if (subject && subjectCounts[subject] < 3) {
-                    const room = assignRoom(false);
-                    row.push([subject, subjectToFacultyMap[subject], room]);
-                    rowUsedSubjects.add(subject);
-                    subjectCounts[subject]++;
-                } else {
-                    row.push([null, null, null]); // If no valid subject is found, leave cell empty
+        // Fill the remaining slots sequentially
+        for (let j = 0; j < columns; j++) {
+            if (j === 2 || j === 5 || row[j][0] !== null) {
+                continue; // Skip breaks and already filled slots
+            }
+
+            let subject;
+            let attempts = 0;
+            do {
+                subject = shuffledSubjects[subjectIndex % shuffledSubjects.length];
+                subjectIndex++;
+                attempts++;
+                if (attempts > subjects.length) {
+                    break; // Avoid infinite loop if no valid subject is found
                 }
+            } while (
+                rowUsedSubjects.has(subject) ||
+                subjectCounts[subject] >= 3
+            );
+
+            if (subject && subjectCounts[subject] < 3) {
+                const room = assignRoom(false);
+                row[j] = [subject, subjectToFacultyMap[subject], room];
+                rowUsedSubjects.add(subject);
+                subjectCounts[subject]++;
+            } else {
+                // Fill remaining slots with empty if no subject is available
+                for (let k = j; k < columns; k++) {
+                    if (k !== 2 && k !== 5) {
+                        row[k] = [null, null, null];
+                    }
+                }
+                break;
             }
         }
 
@@ -231,15 +233,18 @@ function generateAndRenderAllTimetables() {
     // Clear existing content
     const timetableContainer = document.getElementById('timetable-container');
     if (timetableContainer) {
-        timetableContainer.innerHTML = ''; // Clear any previously rendered timetable
+        timetableContainer.innerHTML = ''; // Clear any previously rendered
+// content in the container
     }
 
-    // Generate and render timetables for each division
+    // Generate timetable for each division and render it
     divisions.forEach(division => {
         const timetableMatrix = generateTimetableForDivision(division);
         renderTimetable(division, timetableMatrix);
     });
 }
 
-// Trigger timetable generation and rendering
-generateAndRenderAllTimetables();
+// Trigger timetable generation on page load or button click
+document.addEventListener('DOMContentLoaded', () => {
+    generateAndRenderAllTimetables();
+});
