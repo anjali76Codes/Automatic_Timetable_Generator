@@ -72,7 +72,8 @@ function generateTimetableForDivision(division) {
     subjects.forEach(subject => (subjectCounts[subject] = 0));
 
     for (let i = 0; i < daysOfWeek.length; i++) {
-        const row = new Array(columns).fill([null, null, null]);
+        // const row = new Array(columns).fill([null, null, null]);
+        const row = new Array(columns).fill([null, null]);
         const shuffledSubjects = [...subjects];
         shuffleArray(shuffledSubjects);
 

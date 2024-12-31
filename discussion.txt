@@ -1,0 +1,143 @@
+# Base conditions
+
+- 3 times maximum per subject in a week ✅
+- lab subjects 2 hrs and only once a week ✅
+- breaks and recess ✅
+- 3 timetables ✅
+- room numbers clashing ✅
+
+
+# Code Analysis
+
+data we have
+subjects
+l-subjects
+faculties
+rooms
+divisions
+
+
+- there is first subject to faculty mapping -> subjectToFacultyMap
+- matrix - rows and cols -> rows - days, cols - timings/slots
+- function to shuffle the subjects from the subjects array
+- function to assign lab rooms & lecture rooms based on the true or false -> as the rooms are allocating
+- function that shifts null values to right -> in each row
+
+- generate timetable for divisions
+    - var to store count of subjects
+    - matrix starts forming 
+        - for loop till no of days / rows
+        - subjects are shuffled and stored in a variable
+        - lab subject-teacher for the day is assigned
+        - slots and lab room are assigned to the lab randomly - consecutively - [firstSlot, firstSlot + 1]
+        - slots and lecture room are assigned to the lab randomly
+        - if there are no subjects in the row then add one
+        - html part to render the timetable
+
+
+
+# Outline of the desired Code
+
+1. Logic Part
+
+// data
+const divisions = []
+const faculties = [
+    {
+        faculty, teaching_subject
+    }
+]
+const subjects = []
+const labSubjects = []
+const rooms = []
+
+// functions
+
+function subject_map_to_faculty() {
+    // logic to map subjects to faculties
+
+    // store in the variable -> subjectToFacultyMap
+}
+
+function shuffleArrayForSubjects() {
+    for() {
+        // logic to shuffle the subjects array
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+
+function assigRoomsLabsClass(boolean_value) {
+    // logic to assign rooms based on true or false
+    if(true) {
+        // do for lab
+    } else {
+        // do for lec
+    }
+}
+
+function shiftNullToEnd(row) {
+    
+    newRow = [nonNull, null]
+
+    map(()=> {
+    finalRow = keeping the breaks        
+    })
+
+    return finalRow
+}
+
+
+function generateTimetableForDivision(division) {
+
+    // variables
+    matrix[]
+    subjectCount - hash
+
+    for(noOfRows) {
+
+        // shuffle subjects
+        subjects
+        shuffleArray(subjects)
+
+        // lab logic
+        while(consecutiveSlots) {
+            consecutiveSlots = [firstSlot, firstSlot + 1]
+        }
+        // assign lab rooms
+
+        // lecture slots logic
+        for(columns) {
+            // skip 2 and 5 col
+            // add lecture slots
+        }
+
+        // filling the lecture slots into the actual rows
+        for(lecture_slots) {
+            if(slotsAreEmpty) {
+                do {
+                    // assign subjects to the slot
+
+                } while(untilSubjectOccursMoreThanThrice)
+            }
+
+            // logic for the entire week 
+            if(subjectCount<3) {
+                // assign subject and the room
+            } else {
+                // assign null
+            }
+        }
+
+        // shift to right logic
+        if(anyNullInBetween) {
+
+            // shift the subjects to the right
+            matrix.push(shiftedRow);
+            
+        }
+    }
+}
+
+
+
