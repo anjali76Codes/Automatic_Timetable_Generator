@@ -43,14 +43,37 @@ function assignRoom(isLab) {
     }
 }
 
-// Function to generate a timetable for a division
+// Function to shift null values to the right in a row (excluding breaks)
+function shiftNullsToRight(row) {
+    // Exclude break slots (2 and 5)
+    const nonBreakSlots = row.filter((_, idx) => idx !== 2 && idx !== 5);
+    const nonNullValues = nonBreakSlots.filter(slot => slot[0] !== null);
+    const nullValuesCount = nonBreakSlots.length - nonNullValues.length;
+
+    // Create a new array with non-null values followed by nulls
+    const newRow = [...nonNullValues, ...new Array(nullValuesCount).fill([null, null, null])];
+
+    // Now, reconstruct the row by placing the break slots (index 2 and 5) back in the same positions
+    const finalRow = row.map((slot, idx) => {
+        if (idx === 2 || idx === 5) {
+            return slot; // Keep breaks as they are
+        } else {
+            return newRow.shift();
+        }
+    });
+
+    return finalRow;
+}
+
+// Function to generate timetable for a division
 function generateTimetableForDivision(division) {
     const matrix = [];
     const subjectCounts = {}; // Track the count of each subject
     subjects.forEach(subject => (subjectCounts[subject] = 0));
 
     for (let i = 0; i < daysOfWeek.length; i++) {
-        const row = new Array(columns).fill([null, null, null]);
+        // const row = new Array(columns).fill([null, null, null]);
+        const row = new Array(columns).fill([null, null]);
         const shuffledSubjects = [...subjects];
         shuffleArray(shuffledSubjects);
 
@@ -64,6 +87,7 @@ function generateTimetableForDivision(division) {
         const availableSlots = [0, 1, 3, 4, 6, 7, 8];
         let consecutiveSlots = [];
 
+        // Try to assign consecutive slots for lab subjects
         while (consecutiveSlots.length === 0) {
             const randomSlotIndex = Math.floor(Math.random() * availableSlots.length);
             const firstSlot = availableSlots[randomSlotIndex];
@@ -85,47 +109,61 @@ function generateTimetableForDivision(division) {
         row[consecutiveSlots[1]] = [labSubject, labTeacher, labRoom];
         rowUsedSubjects.add(labSubject);
 
-        // Fill the remaining slots sequentially
+        // Now assign lecture subjects to the remaining available slots
+        const lectureSlots = [];
         for (let j = 0; j < columns; j++) {
-            if (j === 2 || j === 5 || row[j][0] !== null) {
-                continue; // Skip breaks and already filled slots
-            }
-
-            let subject;
-            let attempts = 0;
-            do {
-                subject = shuffledSubjects[subjectIndex % shuffledSubjects.length];
-                subjectIndex++;
-                attempts++;
-                if (attempts > subjects.length) {
-                    break; // Avoid infinite loop if no valid subject is found
-                }
-            } while (
-                rowUsedSubjects.has(subject) ||
-                subjectCounts[subject] >= 3
-            );
-
-            if (subject && subjectCounts[subject] < 3) {
-                const room = assignRoom(false);
-                row[j] = [subject, subjectToFacultyMap[subject], room];
-                rowUsedSubjects.add(subject);
-                subjectCounts[subject]++;
-            } else {
-                // Fill remaining slots with empty if no subject is available
-                for (let k = j; k < columns; k++) {
-                    if (k !== 2 && k !== 5) {
-                        row[k] = [null, null, null];
-                    }
-                }
-                break;
+            if (j === 2 || j === 5) continue; // Skip breaks (index 2 and 5)
+            if (row[j][0] === null) {
+                lectureSlots.push(j); // Collect available lecture slots
             }
         }
 
-        matrix.push(row);
+        // Fill lecture slots without leaving gaps
+        let emptySlots = lectureSlots.length;
+        for (let j = 0; j < lectureSlots.length; j++) {
+            if (subjectIndex < shuffledSubjects.length && emptySlots > 0) {
+                let subject;
+                let attempts = 0;
+                do {
+                    subject = shuffledSubjects[subjectIndex];
+                    subjectIndex++;
+                    attempts++;
+                    if (attempts > shuffledSubjects.length) break; // Avoid infinite loop
+                } while (
+                    rowUsedSubjects.has(subject) || subjectCounts[subject] >= 3
+                );
+
+                // Place the subject in the slot if it's available and hasn't been used 3 times
+                if (subject && subjectCounts[subject] < 3) {
+                    const room = assignRoom(false);
+                    row[lectureSlots[j]] = [subject, subjectToFacultyMap[subject], room];
+                    subjectCounts[subject]++;
+                    rowUsedSubjects.add(subject);
+                }
+            } else {
+                // If there are still empty slots, just leave them empty
+                row[lectureSlots[j]] = [null, null, null];
+                emptySlots--;
+            }
+        }
+
+        // Shift null values to the right for the row
+        const shiftedRow = shiftNullsToRight(row);
+
+        // Ensure that the row is not entirely blank (if no subjects assigned, fallback)
+        if (shiftedRow.every(slot => slot[0] === null)) {
+            const randomSlot = Math.floor(Math.random() * columns);
+            const fallbackSubject = shuffledSubjects[subjectIndex % shuffledSubjects.length];
+            const fallbackRoom = assignRoom(false);
+            shiftedRow[randomSlot] = [fallbackSubject, subjectToFacultyMap[fallbackSubject], fallbackRoom];
+        }
+
+        matrix.push(shiftedRow);
     }
 
     return matrix;
 }
+
 
 // Function to render the timetable in the HTML container
 function renderTimetable(division, matrix) {
@@ -234,7 +272,7 @@ function generateAndRenderAllTimetables() {
     const timetableContainer = document.getElementById('timetable-container');
     if (timetableContainer) {
         timetableContainer.innerHTML = ''; // Clear any previously rendered
-// content in the container
+        // content in the container
     }
 
     // Generate timetable for each division and render it
