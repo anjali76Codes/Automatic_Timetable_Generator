@@ -43,7 +43,7 @@ const departmentSchema = Schema(
                         required: true
                     }
                 ]
-            }
+            }   
         ],
         allocatedLabs: [
             {
