@@ -1,5 +1,9 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+
+
+dotenv.config();
 
 const app = express();
 
@@ -31,9 +35,11 @@ app.use(express.static("public"));
 
 // import routes
 import testingRouter from "./routes/testing.routes.js";
+import collegeRouter from "./routes/college.routes.js"
 
 // create routes
 app.use("/api/v1/testing", testingRouter);
+app.use("/api/v1/timetable", collegeRouter);
 
 // once we have /testing, entire control is handled by testingRouter
 
