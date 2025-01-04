@@ -23,7 +23,9 @@
     "prettier": "^3.4.2"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
-    "mongoose": "^8.9.3"
+    "mongoose": "^8.9.3",
+    "mongoose-paginate-v2": "^1.8.5"
   }
 }
