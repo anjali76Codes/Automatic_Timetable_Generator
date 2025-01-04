@@ -1,0 +1,70 @@
+
+###
+npm init - create package.json file - fill all the details
+- for automatic creation - npm init -y
+
+if necessary, add type to module for import syntax in package.json
+by default it is commonjs
+
+
+###
+install dev dependencies - nodemon and prettier
+- npm i --save-d nodemon prettier
+
+create two files
+.prettierrc - rules of the code for team
+.prettierignore 
+
+
+###
+then we will create a source folder in which all other folders will be there
+
+then we will create essential folders into the src 
+use mkdir command -> mkdir controllers
+
+controllers
+middlewares
+models
+db
+utils
+routes
+
+we will then also create some default important files
+use touch command -> touch index.js
+
+index.js 
+app.js 
+constants.js 
+.env 
+.env.sample
+readme.md
+
+
+### 
+now we will create necessary files into individual folders
+
+db/index.js - to establish database connection
+
+
+### 
+install dependencies in the root folder
+
+express 
+mongoose
+
+
+
+### 
+test by writing console.log() in index.js
+to run the file we create our own script
+
+start node src/index.js
+dev nodemon src/index.js
+
+### 
+create frontend
+npm create vite@latest
+
+then npm install for basic dependencies
+and then run dev for testing
+
