@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const AddCollege = () => {
@@ -22,16 +23,25 @@ const AddCollege = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
-    
-    // Set isSubmitted to true to display the success message
-    setIsSubmitted(true);
 
-    // Navigate to the department page with the totalDepartments value
-    const totalDepartments = parseInt(formData.totalDepartments, 10);
-    navigate("/departments", { state: { totalDepartments } }); // Navigate with totalDepartments
+    try {
+      // Send the data to the backend using axios
+      const response = await axios.post("http://localhost:3000/api/v1/timetable/add-college", formData);
+
+
+      console.log("Response:", response.data);
+
+      // Set isSubmitted to true to display the success message
+      setIsSubmitted(true);
+
+      // Navigate to the departments page with totalDepartments value
+      const totalDepartments = parseInt(formData.totalDepartments, 10);
+      navigate("/departments", { state: { totalDepartments } }); // Navigate with totalDepartments
+    } catch (error) {
+      console.error("Error adding college:", error);
+    }
   };
 
   return (
@@ -43,7 +53,7 @@ const AddCollege = () => {
         <h2 className="text-4xl font-extrabold text-indigo-600 text-center mb-8">
           Add College Information
         </h2>
-        
+
         {/* Success message only shown after form submission */}
         {isSubmitted && (
           <div className="mb-6 text-center text-green-600 font-semibold text-lg">
