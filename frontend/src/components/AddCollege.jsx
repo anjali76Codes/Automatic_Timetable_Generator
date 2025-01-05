@@ -45,6 +45,11 @@ const AddCollege = () => {
   };
 
   return (
+
+  //   <div 
+  //   className="min-h-screen flex items-center justify-center py-12 px-6 bg-cover bg-center" 
+  //   style={{ backgroundImage: "url('https://i.pinimg.com/736x/82/e2/74/82e27475ae99b973250ab19efd7a33ae.jpg')" }}
+  // >
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center py-12 px-6">
       <form
         onSubmit={handleSubmit}

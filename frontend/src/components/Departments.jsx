@@ -36,7 +36,7 @@ const Departments = () => {
       updatedDepartments[index].showForm = true; // Show the additional info form
       return updatedDepartments;
     });
-  };
+  };  
 
   const handleFormSubmit = (index, departmentInfo) => {
     setDepartments((prevDepartments) => {
