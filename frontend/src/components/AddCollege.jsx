@@ -28,11 +28,12 @@ const AddCollege = () => {
 
     try {
       // Send the data to the backend using axios
-      const response = await axios.post("http://localhost:3000/api/v1/timetable/add-college", formData);
-
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/timetable/add-college",
+        formData
+      );
 
       console.log("Response:", response.data);
-
       // Set isSubmitted to true to display the success message
       setIsSubmitted(true);
 
@@ -45,11 +46,10 @@ const AddCollege = () => {
   };
 
   return (
-
-  //   <div 
-  //   className="min-h-screen flex items-center justify-center py-12 px-6 bg-cover bg-center" 
-  //   style={{ backgroundImage: "url('https://i.pinimg.com/736x/82/e2/74/82e27475ae99b973250ab19efd7a33ae.jpg')" }}
-  // >
+    //   <div
+    //   className="min-h-screen flex items-center justify-center py-12 px-6 bg-cover bg-center"
+    //   style={{ backgroundImage: "url('https://i.pinimg.com/736x/82/e2/74/82e27475ae99b973250ab19efd7a33ae.jpg')" }}
+    // >
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center py-12 px-6">
       <form
         onSubmit={handleSubmit}
@@ -245,3 +245,9 @@ const AddCollege = () => {
 };
 
 export default AddCollege;
+
+
+
+
+
+
