@@ -43,7 +43,7 @@ const departmentSchema = Schema(
                         required: true
                     }
                 ]
-            }   
+            }
         ],
         allocatedLabs: [
             {
@@ -64,6 +64,20 @@ const departmentSchema = Schema(
             {
                 type: Schema.Types.ObjectId,
                 ref: "Subject",
+            }
+        ],
+
+        semDetails: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Semester"
+            }
+        ],
+
+        faculties: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Faculty"
             }
         ]
     }
