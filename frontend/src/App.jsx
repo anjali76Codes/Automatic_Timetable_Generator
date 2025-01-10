@@ -10,7 +10,7 @@ function App() {
         <Route path="/" element={<AddCollege />} />
         <Route path="/departments" element={<Departments />} />
         {/* New route for department details */}
-        <Route path="/department/:id" element={<DepartmentDetails />} />
+        <Route path="/departments/:id" element={<DepartmentDetails />} />
       </Routes>
     </Router>
   );

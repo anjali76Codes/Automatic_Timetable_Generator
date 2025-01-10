@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BasicInformation from '../pages/BasicInformation';
 import Subjects from '../pages/Subjects'; // Importing the Subjects component
+import RoomAllocation from '../pages/RoomAllocation';
+import Faculties from '../pages/Faculties'
 
 const DepartmentDetails = () => {
   const { id } = useParams();
@@ -43,6 +45,14 @@ const DepartmentDetails = () => {
           </li>
           <li>
             <button
+              onClick={() => handleTabChange('room-allocations')}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'room-allocations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            >
+              Room Allocations
+            </button>
+          </li>
+          <li>
+            <button
               onClick={() => handleTabChange('faculties')}
               className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'faculties' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
             >
@@ -57,15 +67,17 @@ const DepartmentDetails = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           {activeTab === 'basic-info' && <BasicInformation />} {/* Render BasicInformation component for 'basic-info' tab */}
           {activeTab === 'subjects' && <Subjects />} {/* Render Subjects component for 'subjects' tab */}
+          {activeTab === 'faculties' && <Faculties />} {/* Render Subjects component for 'subjects' tab */}
           {activeTab === 'sem-info' && (
             <div>
               <h2 className="text-xl font-semibold text-gray-700">Sem Info</h2>
               {/* Display sem info */}
             </div>
           )}
-          {activeTab === 'faculties' && (
+          {activeTab === 'room-allocations' && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-700">Faculties</h2>
+              <h2 className="text-xl font-semibold text-gray-700">Room Allocations</h2>
+              <RoomAllocation />
               {/* Display faculties info */}
             </div>
           )}
