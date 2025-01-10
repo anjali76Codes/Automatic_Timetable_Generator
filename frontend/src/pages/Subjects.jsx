@@ -43,9 +43,10 @@ const Subjects = () => {
 
     setSubjectsList([...subjectsList, newSubject]);
     setSubjectName('');
-    setSemester('');
-    setSubjectType('class'); // Reset subject type
   };
+
+  // Filtered subjects based on selected semester
+  const filteredSubjects = subjectsList.filter(subject => subject.semester === semester);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
@@ -140,21 +141,48 @@ const Subjects = () => {
         </button>
       </div>
 
-      {/* Display Added Subjects */}
+      {/* Display Added Subjects for the selected semester */}
       <div className="mt-8">
-        <h3 className="text-2xl font-semibold text-gray-700 mb-4">Added Subjects</h3>
-        {subjectsList.length === 0 ? (
-          <p>No subjects added yet.</p>
+        <h3 className="text-2xl font-semibold text-gray-700 mb-4">Added Subjects for {semester}</h3>
+        {filteredSubjects.length === 0 ? (
+          <p>No subjects added for this semester yet.</p>
         ) : (
-          <ul className="space-y-4">
-            {subjectsList.map((subject, idx) => (
-              <li key={idx} className="p-4 bg-gray-100 rounded-lg shadow-sm">
-                <h4 className="text-xl font-semibold text-gray-800">{subject.subjectName}</h4>
-                <p className="text-gray-600">Semester: {subject.semester}</p>
-                <p className="text-gray-600">Type: {subject.subjectType === 'class' ? 'Class Subject' : subject.subjectType === 'lab' ? 'Lab Subject' : 'Both'}</p>
-              </li>
-            ))}
-          </ul>
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left text-gray-700">Class Subjects</th>
+                <th className="px-4 py-2 text-left text-gray-700">Lab Subjects</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border-t px-4 py-2">
+                  <ul>
+                    {filteredSubjects
+                      .filter(subject => subject.subjectType === 'class' || subject.subjectType === 'both')
+                      .map((subject, idx) => (
+                        <li key={idx} className="p-2">
+                          <h4 className="text-lg font-semibold text-gray-800">{subject.subjectName}</h4>
+                          <p className="text-gray-600">Semester: {subject.semester}</p>
+                        </li>
+                      ))}
+                  </ul>
+                </td>
+                <td className="border-t px-4 py-2">
+                  <ul>
+                    {filteredSubjects
+                      .filter(subject => subject.subjectType === 'lab' || subject.subjectType === 'both')
+                      .map((subject, idx) => (
+                        <li key={idx} className="p-2">
+                          <h4 className="text-lg font-semibold text-gray-800">{'L-' + subject.subjectName}</h4>
+                          <p className="text-gray-600">Semester: {subject.semester}</p>
+                        </li>
+                      ))}
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         )}
       </div>
     </div>
