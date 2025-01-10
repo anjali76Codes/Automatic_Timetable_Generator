@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Departments = () => {
   const location = useLocation();
-  const { totalDepartments } = location.state; // Get total departments from navigation state
+  const navigate = useNavigate(); // Initialize useNavigate hook
+  const { totalDepartments, departments } = location.state || {}; // Get departments and totalDepartments from state
 
-  const [departments, setDepartments] = useState(
-    Array.from({ length: totalDepartments }, () => ({
-      name: "",
+  const [departmentsState, setDepartmentsState] = useState(
+    Array.from({ length: totalDepartments }, (_, index) => ({
+      name: departments ? departments[index].name : "",
       saved: false,
       showForm: false,
       departmentInfo: {}
@@ -15,7 +16,7 @@ const Departments = () => {
   );
 
   const handleInputChange = (index, value) => {
-    setDepartments((prevDepartments) => {
+    setDepartmentsState((prevDepartments) => {
       const updatedDepartments = [...prevDepartments];
       updatedDepartments[index].name = value;
       return updatedDepartments;
@@ -23,7 +24,7 @@ const Departments = () => {
   };
 
   const handleSave = (index) => {
-    setDepartments((prevDepartments) => {
+    setDepartmentsState((prevDepartments) => {
       const updatedDepartments = [...prevDepartments];
       updatedDepartments[index].saved = true; // Mark this department as saved
       return updatedDepartments;
@@ -31,25 +32,10 @@ const Departments = () => {
   };
 
   const handleAddInfoClick = (index) => {
-    setDepartments((prevDepartments) => {
-      const updatedDepartments = [...prevDepartments];
-      updatedDepartments[index].showForm = true; // Show the additional info form
-      return updatedDepartments;
+    // Navigate to DepartmentDetails page with the department index
+    navigate(`/departments/${index}`, {
+      state: { department: departmentsState[index] }
     });
-  };  
-
-  const handleFormSubmit = (index, departmentInfo) => {
-    setDepartments((prevDepartments) => {
-      const updatedDepartments = [...prevDepartments];
-      updatedDepartments[index].departmentInfo = departmentInfo;
-      updatedDepartments[index].showForm = false; // Hide the form after submitting
-      return updatedDepartments;
-    });
-     // Log the department info to the console
-  console.log(`Department ${index + 1} Info:`, departmentInfo);
-
-
-    alert(`Department ${index + 1} info saved successfully!`);
   };
 
   return (
@@ -58,7 +44,7 @@ const Departments = () => {
         Add Departments
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        {departments.map((department, index) => (
+        {departmentsState.map((department, index) => (
           <div
             key={index}
             className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
@@ -81,7 +67,7 @@ const Departments = () => {
                   onClick={() => handleSave(index)}
                   className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
                 >
-                  Save 
+                  Save
                 </button>
               </>
             ) : (
@@ -91,153 +77,17 @@ const Departments = () => {
                   {department.name}
                 </p>
                 <button
-                  onClick={() => handleAddInfoClick(index)}
+                  onClick={() => handleAddInfoClick(index)} // Navigate to the department details page
                   className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
                 >
                   Add Info <span className="ml-2">+</span>
                 </button>
-
-                {/* Show the Add Info form if the user clicked the button */}
-                {department.showForm && (
-                  <DepartmentForm
-                    onSubmit={(departmentInfo) =>
-                      handleFormSubmit(index, departmentInfo)
-                    }
-                  />
-                )}
               </>
             )}
           </div>
         ))}
       </div>
     </div>
-  );
-};
-
-// Form for adding department information
-const DepartmentForm = ({ onSubmit }) => {
-  const [departmentInfo, setDepartmentInfo] = useState({
-    departmentHOD: "",
-    totalFaculties: "",
-    totalClasses: "",
-    totalLabs: "",
-    totalStudents: "",
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setDepartmentInfo({ ...departmentInfo, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(departmentInfo);
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="mt-4 w-full bg-white p-4 rounded-lg shadow-md"
-    >
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label
-            htmlFor="departmentHOD"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Department HOD
-          </label>
-          <input
-            type="text"
-            id="departmentHOD"
-            name="departmentHOD"
-            value={departmentInfo.departmentHOD}
-            onChange={handleInputChange}
-            placeholder="Enter HOD name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="totalFaculties"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Total Faculties
-          </label>
-          <input
-            type="number"
-            id="totalFaculties"
-            name="totalFaculties"
-            value={departmentInfo.totalFaculties}
-            onChange={handleInputChange}
-            placeholder="Enter total faculties"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="totalClasses"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Total Classes
-          </label>
-          <input
-            type="number"
-            id="totalClasses"
-            name="totalClasses"
-            value={departmentInfo.totalClasses}
-            onChange={handleInputChange}
-            placeholder="Enter total classes"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="totalLabs"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Total Labs
-          </label>
-          <input
-            type="number"
-            id="totalLabs"
-            name="totalLabs"
-            value={departmentInfo.totalLabs}
-            onChange={handleInputChange}
-            placeholder="Enter total labs"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="totalStudents"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Total Students
-          </label>
-          <input
-            type="number"
-            id="totalStudents"
-            name="totalStudents"
-            value={departmentInfo.totalStudents}
-            onChange={handleInputChange}
-            placeholder="Enter total students"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-      </div>
-      <button
-        type="submit"
-        className="mt-4 w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
-      >
-        Save Info
-      </button>
-    </form>
   );
 };
 
