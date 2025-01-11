@@ -36,10 +36,12 @@ app.use(express.static("public"));
 // import routes
 import testingRouter from "./routes/testing.routes.js";
 import collegeRouter from "./routes/college.routes.js"
+import userRouter from "./routes/user.routes.js"
 
 // create routes
 app.use("/api/v1/testing", testingRouter);
 app.use("/api/v1/timetable", collegeRouter);
+app.use("/api", userRouter);
 
 // once we have /testing, entire control is handled by testingRouter
 

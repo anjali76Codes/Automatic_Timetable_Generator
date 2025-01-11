@@ -9,33 +9,27 @@ const departmentSchema = Schema(
         },
         departmentHOD: {
             type: String,
-            required: true
         },
         totalFaculties: {
             type: Number,
-            required: true,
             min: [0, "Total faculties cannot be negative"]
         },
         totalClasses: {
             type: Number,
-            required: true,
             min: [0, "Total classes cannot be negative"]
         },
         totalLabs: {
             type: Number,
-            required: true,
             min: [0, "Total labs cannot be negative"]
         },
         allocatedClasses: [
             {
                 floor: {
                     type: String,
-                    required: true
                 },
                 roomNumbers: [
                     {
                         type: String,
-                        required: true
                     }
                 ]
             }
@@ -44,12 +38,10 @@ const departmentSchema = Schema(
             {
                 floor: {
                     type: String,
-                    required: true
                 },
                 labNumbers: [
                     {
                         type: String,
-                        required: true
                     }
                 ]
             }
