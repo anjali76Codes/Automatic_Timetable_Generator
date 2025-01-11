@@ -42,6 +42,11 @@ const collegeSchema = new Schema(
             required: true,
             min: [0, "Total departments cannot be negative"]
         },
+        totalFloors: {
+            type: Number,
+            required: true,
+            min: [0, "Total floors cannot be negative"]
+        },
 
         // Reference to other collection (Department model)
         collegeDepartments: [

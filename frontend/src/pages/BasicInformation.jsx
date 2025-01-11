@@ -8,7 +8,6 @@ const BasicInformation = () => {
     totalClasses: '',
     totalLabs: '',
     totalStudents: '',
-    totalFloors: ''
   });
 
 
@@ -141,24 +140,6 @@ const BasicInformation = () => {
           onChange={handleChange}
           className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
           placeholder="Enter total students"
-          required
-          min="0"
-        />
-      </div>
-
-      {/* Total Floors */}
-      <div>
-        <label htmlFor="totalFloors" className="block text-lg font-medium text-gray-700 mb-2">
-          Total Floors
-        </label>
-        <input
-          type="number"
-          id="totalFloors"
-          name="totalFloors"
-          value={formData.totalFloors}
-          onChange={handleChange}
-          className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
-          placeholder="Enter total Floors"
           required
           min="0"
         />
