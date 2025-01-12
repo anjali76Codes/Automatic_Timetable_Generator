@@ -22,7 +22,7 @@ function App() {
         <Route path="/add-college" element={<AddCollege />} />
         <Route path="/getCollege" element={<CollegeDetails />} />
 
-        {/* <Route path="/departments/:id" element={<DepartmentDetails />} /> */}
+        <Route path="/departments/:collegeCode/:id" element={<DepartmentDetails />} />
       </Routes>
     </BrowserRouter>
   );

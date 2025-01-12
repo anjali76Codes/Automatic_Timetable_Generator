@@ -9,5 +9,6 @@ router.route("/add-college").post(authenticateUser, addCollege); // Add authenti
 router.route("/college/:collegeCode").get(authenticateUser, getCollegeByCode); // Add authentication
 router.route("/colleges").get(authenticateUser, getUserColleges); // Add authentication
 router.route("/colleges/:collegeId").get(authenticateUser, getCollegeDetails);
+// router.get('/check-college-status', authenticate, checkCollegeStatus);
 
 export default router;
