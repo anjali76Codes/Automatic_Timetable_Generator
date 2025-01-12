@@ -31,16 +31,14 @@ function Signin() {
             const response = await axios.post('http://localhost:3000/api/signin', formData);
 
             if (response.status === 200) {
-                const { token, username, collegeCode } = response.data; // Destructure the response
-                localStorage.setItem('token', token); // Store token
+                const { token, username, collegeCode } = response.data;
 
-                // Store username and collegeCode if they exist
-                if (username) {
-                    localStorage.setItem('username', username);
-                }
-                if (collegeCode) {
-                    localStorage.setItem('collegeCode', collegeCode); // Store collegeCode (non-sensitive)
-                }
+                localStorage.setItem('token', token); // Store token
+                if (username) localStorage.setItem('username', username);
+                if (collegeCode) localStorage.setItem('collegeCode', collegeCode);
+
+                // Trigger a custom event for Navbar to update
+                window.dispatchEvent(new Event('storage')); // This will notify the Navbar component
 
                 navigate('/'); // Redirect to home page after successful login
             }
