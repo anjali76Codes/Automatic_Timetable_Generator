@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
 
+
+
 // Controller to handle adding a new college
 const addCollege = asyncHandler(async (req, res) => {
     const {
@@ -34,15 +36,22 @@ const addCollege = asyncHandler(async (req, res) => {
     });
 
     // Save the college document to the database
-    await newCollege.save();
+    const savedCollege = await newCollege.save();
 
     // Optionally: Add the college to the user's profile
     await User.findByIdAndUpdate(userId, {
-        $push: { colleges: newCollege._id },
+        $push: { colleges: savedCollege._id },
     });
 
-    return res.status(201).json(new ApiResponse(201, "College added successfully", newCollege));
+    // Return the college ID in the response
+    return res.status(201).json(new ApiResponse(201, "College added successfully", { 
+        collegeId: savedCollege._id, 
+        collegeDetails: savedCollege 
+    }));
 });
+
+
+
 
 // Controller to get a college by its code
 const getCollegeByCode = asyncHandler(async (req, res) => {
@@ -59,4 +68,21 @@ const getCollegeByCode = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "College details fetched successfully", college));
 });
 
-export { getCollegeByCode, addCollege };
+
+
+
+
+
+// const checkCollegeStatus = async (req, res) => {
+//     try {
+//       const user = await User.findById(req.user.id);
+//       if (!user) {
+//         return res.status(404).json({ message: "User not found" });
+//       }
+//       res.json({ hasSubmittedCollege: user.hasSubmittedCollege });
+//     } catch (error) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   };
+
+export { getCollegeByCode, addCollege  };
