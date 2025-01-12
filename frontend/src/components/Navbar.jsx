@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [collegeCode, setCollegeCode] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
     // Track login state based on localStorage
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
     useEffect(() => {
-        // Check if the user is signed in when the component mounts
         const token = localStorage.getItem('token');
-        if (token) {
-            setIsLoggedIn(true);
-        }
+        setIsLoggedIn(!!token);
 
         // Listen for changes in localStorage (sign in or sign out)
         const handleStorageChange = () => {
@@ -35,9 +32,9 @@ const Navbar = () => {
         };
     }, []);
 
+    // Fetch college details when logged in
     useEffect(() => {
         const token = localStorage.getItem('token');
-
         if (token) {
             const fetchCollegeDetails = async () => {
                 try {
@@ -49,9 +46,7 @@ const Navbar = () => {
                             },
                         }
                     );
-
                     const collegeIds = response.data.colleges;
-
                     if (collegeIds && collegeIds.length > 0) {
                         const collegeResponse = await axios.get(
                             `http://localhost:3000/api/v1/timetable/colleges/${collegeIds[0]}`,
@@ -63,7 +58,6 @@ const Navbar = () => {
                         );
                         setCollegeCode(collegeResponse.data.collegeCode);
                     }
-
                     setIsLoading(false);
                 } catch (err) {
                     console.error('Error fetching college details:', err);
@@ -71,12 +65,19 @@ const Navbar = () => {
                     setIsLoading(false);
                 }
             };
-
             fetchCollegeDetails();
         } else {
             setIsLoading(false);
         }
     }, [isLoggedIn]); // Re-fetch data when login state changes
+
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Remove token
+        localStorage.removeItem('username'); // Remove username
+        setIsLoggedIn(false); // Update login state
+        setCollegeCode(null); // Clear college code
+        navigate('/signin'); // Redirect to signin page
+    };
 
     return (
         <div>
@@ -94,6 +95,19 @@ const Navbar = () => {
                                 Departments
                             </Link>
                         )}
+                        {isLoggedIn ? (
+                            <button
+                                onClick={handleLogout}
+                                className="text-white hover:bg-blue-600 py-2 px-4 rounded"
+                            >
+                                Logout
+                            </button>
+                        ) : (
+                            <>
+                                <Link to="/signin" className="text-white hover:bg-blue-600 py-2 px-4 rounded">Sign In</Link>
+                                <Link to="/signup" className="text-white hover:bg-blue-600 py-2 px-4 rounded">Sign Up</Link>
+                            </>
+                        )}
                     </div>
                     <div className="md:hidden">
                         <button onClick={toggleMenu} className="text-white focus:outline-none">
@@ -110,6 +124,19 @@ const Navbar = () => {
                 <Link to="/add-college" className="text-white block py-2 px-4">Add College</Link>
                 {collegeCode && !isLoading && (
                     <Link to={`/departments/${collegeCode}`} className="text-white block py-2 px-4">Departments</Link>
+                )}
+                {isLoggedIn ? (
+                    <button
+                        onClick={handleLogout}
+                        className="text-white block py-2 px-4"
+                    >
+                        Logout
+                    </button>
+                ) : (
+                    <>
+                        <Link to="/signin" className="text-white block py-2 px-4">Sign In</Link>
+                        <Link to="/signup" className="text-white block py-2 px-4">Sign Up</Link>
+                    </>
                 )}
             </div>
         </div>

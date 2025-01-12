@@ -44,9 +44,9 @@ const addCollege = asyncHandler(async (req, res) => {
     });
 
     // Return the college ID in the response
-    return res.status(201).json(new ApiResponse(201, "College added successfully", { 
-        collegeId: savedCollege._id, 
-        collegeDetails: savedCollege 
+    return res.status(201).json(new ApiResponse(201, "College added successfully", {
+        collegeId: savedCollege._id,
+        collegeDetails: savedCollege
     }));
 });
 
@@ -68,6 +68,27 @@ const getCollegeByCode = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "College details fetched successfully", college));
 });
 
+const deleteCollege = asyncHandler(async (req, res) => {
+    const { collegeId } = req.params; // Use collegeId here
+    const userId = req.user.userId; // Get userId from middleware
+
+    // Find the college by collegeId and ensure it belongs to the logged-in user
+    const college = await College.findOne({ _id: collegeId, createdBy: userId });
+
+    if (!college) {
+        return res.status(404).json(new ApiResponse(404, "College not found or not accessible by this user"));
+    }
+
+    // Delete the college from the database
+    await College.findByIdAndDelete(college._id);
+
+    // Optionally: Remove the college from the user's profile (if necessary)
+    await User.findByIdAndUpdate(userId, {
+        $pull: { colleges: college._id },
+    });
+
+    return res.status(200).json(new ApiResponse(200, "College deleted successfully"));
+});
 
 
 
@@ -85,4 +106,4 @@ const getCollegeByCode = asyncHandler(async (req, res) => {
 //     }
 //   };
 
-export { getCollegeByCode, addCollege  };
+export { getCollegeByCode, addCollege, deleteCollege };

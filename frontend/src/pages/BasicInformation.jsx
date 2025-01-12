@@ -10,31 +10,24 @@ const BasicInformation = () => {
     totalLabs: '',
     totalStudents: '',
   });
-  const [collegeId, setCollegeId] = useState(null); // Store the college ID
-  const [isSaved, setIsSaved] = useState(false); // Track if information is saved
-  const [error, setError] = useState(""); // Track any errors
+  const [collegeId, setCollegeId] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-
     const fetchCollegeId = async () => {
       try {
         if (!token) {
           throw new Error('No token found');
         }
-
-        const response = await axios.get(
-          'http://localhost:3000/api/v1/timetable/colleges', // Get college data associated with user
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        const response = await axios.get('http://localhost:3000/api/v1/timetable/colleges', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data && response.data.colleges && response.data.colleges.length > 0) {
-          // Assuming you get the list of colleges and pick the first one
-          setCollegeId(response.data.colleges[0]); // Set collegeId (change logic based on your structure)
+          setCollegeId(response.data.colleges[0]);
         } else {
           throw new Error('No college found for the user');
         }
@@ -63,19 +56,18 @@ const BasicInformation = () => {
     }
 
     const apiUrl = "http://localhost:3000/api/departments";
-
-    // Log department details to the console
-    console.log("Department details:", formData);
+    const departmentId = isSaved ? formData.departmentId : null;
 
     try {
       const response = await fetch(apiUrl, {
-        method: "POST",
+        method: departmentId ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
-          collegeId: collegeId, // Include the fetched collegeId
+          collegeId: collegeId,
+          departmentId: departmentId,
         }),
       });
 
@@ -85,25 +77,24 @@ const BasicInformation = () => {
 
       const result = await response.json();
       alert("Department information saved successfully");
-      setIsSaved(true); // Mark as saved
-      console.log("Response result: ", result); // Log the response from the API
+      setIsSaved(true);
+      setFormData(result.department);
     } catch (error) {
       setError("Error saving information: " + error.message);
     }
   };
 
   const handleEdit = () => {
-    setIsSaved(false); // Toggle back to edit mode
+    setIsSaved(false); // Allow editing again (if you decide to revert this behavior)
   };
 
-  // Display saved details
+  // Display saved details and disable form fields when isSaved is true
   if (isSaved) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center text-gradient">
           Department Information
         </h2>
-
         <div className="space-y-4">
           <p><strong>Department Name:</strong> {formData.departmentName}</p>
           <p><strong>Department HOD:</strong> {formData.departmentHOD}</p>
@@ -112,13 +103,6 @@ const BasicInformation = () => {
           <p><strong>Total Labs:</strong> {formData.totalLabs}</p>
           <p><strong>Total Students:</strong> {formData.totalStudents}</p>
         </div>
-
-        <button
-          onClick={handleEdit}
-          className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          Edit Details
-        </button>
       </div>
     );
   }
@@ -127,7 +111,6 @@ const BasicInformation = () => {
     <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center text-gradient">Basic Information</h2>
 
-      {/* Department Name and HOD in the same row */}
       <div className="grid grid-cols-2 gap-6">
         <div className="col-span-1">
           <label htmlFor="departmentName" className="block text-lg font-medium text-gray-700 mb-2">
@@ -139,9 +122,10 @@ const BasicInformation = () => {
             name="departmentName"
             value={formData.departmentName}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter department name"
             required
+            disabled={isSaved} // Disable input after save
           />
         </div>
         <div className="col-span-1">
@@ -154,14 +138,14 @@ const BasicInformation = () => {
             name="departmentHOD"
             value={formData.departmentHOD}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter HOD name"
             required
+            disabled={isSaved} // Disable input after save
           />
         </div>
       </div>
 
-      {/* Total Faculties, Classes, Labs in the same row */}
       <div className="grid grid-cols-3 gap-6">
         <div>
           <label htmlFor="totalFaculties" className="block text-lg font-medium text-gray-700 mb-2">
@@ -173,10 +157,11 @@ const BasicInformation = () => {
             name="totalFaculties"
             value={formData.totalFaculties}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter total faculties"
             required
             min="0"
+            disabled={isSaved} // Disable input after save
           />
         </div>
         <div>
@@ -189,10 +174,11 @@ const BasicInformation = () => {
             name="totalClasses"
             value={formData.totalClasses}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter total classes"
             required
             min="0"
+            disabled={isSaved} // Disable input after save
           />
         </div>
         <div>
@@ -205,15 +191,15 @@ const BasicInformation = () => {
             name="totalLabs"
             value={formData.totalLabs}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+            className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter total labs"
             required
             min="0"
+            disabled={isSaved} // Disable input after save
           />
         </div>
       </div>
 
-      {/* Total Students */}
       <div>
         <label htmlFor="totalStudents" className="block text-lg font-medium text-gray-700 mb-2">
           Total Students
@@ -224,28 +210,26 @@ const BasicInformation = () => {
           name="totalStudents"
           value={formData.totalStudents}
           onChange={handleChange}
-          className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 hover:border-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-105 placeholder-gray-400 text-gray-800"
+          className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="Enter total students"
           required
           min="0"
+          disabled={isSaved} // Disable input after save
         />
       </div>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-      >
-        Save Information
-      </button>
+      {!isSaved && (
+        <button
+          type="submit"
+          className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-lg font-semibold rounded-lg"
+        >
+          Save Information
+        </button>
+      )}
 
-      {/* Error Message */}
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
     </form>
   );
 };
 
 export default BasicInformation;
-
-
-

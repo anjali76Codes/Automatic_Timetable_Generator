@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCollege, getCollegeByCode } from "../controllers/college.controllers.js";
+import { addCollege, deleteCollege, getCollegeByCode } from "../controllers/college.controllers.js";
 import { authenticateUser } from "../middlewares/authenticateUser.middlewares.js";
 import { getCollegeDetails, getUserColleges } from "../controllers/user.controllers.js";
 
@@ -9,6 +9,6 @@ router.route("/add-college").post(authenticateUser, addCollege); // Add authenti
 router.route("/college/:collegeCode").get(authenticateUser, getCollegeByCode); // Add authentication
 router.route("/colleges").get(authenticateUser, getUserColleges); // Add authentication
 router.route("/colleges/:collegeId").get(authenticateUser, getCollegeDetails);
-// router.get('/check-college-status', authenticate, checkCollegeStatus);
+router.route("/colleges/:collegeId").delete(authenticateUser, deleteCollege);
 
 export default router;

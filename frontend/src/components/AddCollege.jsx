@@ -63,6 +63,8 @@ const AddCollege = () => {
 
           const collegeDetails = await Promise.all(collegeDetailsPromises);
           setColleges(collegeDetails);
+        } else {
+          setColleges([]);
         }
         setIsLoading(false);
       } catch (error) {
@@ -77,11 +79,11 @@ const AddCollege = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       // Retrieve the token from localStorage
       const token = localStorage.getItem("token");
-  
+
       // Send the data to the backend using axios, including the token in the headers
       const response = await axios.post(
         "http://localhost:3000/api/v1/timetable/add-college",
@@ -92,29 +94,70 @@ const AddCollege = () => {
           },
         }
       );
-  
+
       console.log("Response:", response.data);
-  
+
       // Extract collegeCode from the nested structure
       const collegeCode = response.data.message?.collegeDetails?.collegeCode;
-  
+
       if (!collegeCode) {
         throw new Error("College code not found in response.");
       }
-  
+
       // Set isSubmitted to true to display the success message
       setIsSubmitted(true);
-  
+
+      // Show success alert
+      alert("College added successfully!");
+
       // Navigate to the departments page with collegeCode
       navigate(`/departments/${collegeCode}`, { state: { collegeCode } });
+
+      // Reload the page to reflect the newly added college
+      window.location.reload();
     } catch (error) {
       console.error("Error adding college:", error.message || error);
     }
   };
-  
+
+  // Handle delete college
+  const handleDelete = async (collegeCode) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.delete(
+        `http://localhost:3000/api/v1/timetable/colleges/${collegeCode}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Delete response:", response.data);
+
+      // Remove deleted college from the list
+      const updatedColleges = colleges.filter((college) => college.collegeCode !== collegeCode);
+      setColleges(updatedColleges);
+
+      // If no colleges are left, show the form again
+      if (updatedColleges.length === 0) {
+        setIsLoading(true); // Set loading to true to show the loader again
+        fetchColleges(); // Fetch colleges again (will show form if no colleges left)
+      }
+
+      // Show delete confirmation alert
+      alert("College deleted successfully!");
+
+      // Reload the page to reflect the deleted college
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting college:", error);
+    }
+  };
 
   if (isLoading) {
-    return <div>Loading colleges...</div>;
+    return <div className="text-center py-12">Loading colleges...</div>;
   }
 
   if (error) {
@@ -309,10 +352,23 @@ const AddCollege = () => {
             Your Colleges
           </h2>
           <div>
-            {colleges.map((college, index) => (
-              <div key={index} className="college-card mb-4 p-4 border border-gray-300 rounded-lg">
+            {colleges.map((college) => (
+              <div key={college._id} className="college-card mb-4 p-4 border border-gray-300 rounded-lg">
                 <h3 className="text-2xl font-semibold text-indigo-600">{college.collegeName}</h3>
-                {/* You can display more college details here */}
+                <p><strong>Code:</strong> {college.collegeCode}</p>
+                <p><strong>Principal:</strong> {college.collegePrincipal}</p>
+                <p><strong>Address:</strong> {college.collegeAddress}</p>
+                <p><strong>Total Classes:</strong> {college.totalClasses}</p>
+                <p><strong>Total Labs:</strong> {college.totalLabs}</p>
+                <p><strong>Total Faculties:</strong> {college.totalFaculties}</p>
+                <p><strong>Total Departments:</strong> {college.totalDepartments}</p>
+                <p><strong>Total Floors:</strong> {college.totalFloors}</p>
+                <button
+                  onClick={() => handleDelete(college._id)} // Pass collegeCode here
+                  className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                >
+                  Delete College
+                </button>
               </div>
             ))}
           </div>

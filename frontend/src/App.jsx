@@ -7,6 +7,7 @@ import Signin from "./components/Signin";
 import Home from "./components/Home";
 import DepartmentDetails from "./components/DepartmentDetails";
 import CollegeDetails from "./pages/CollegeDetails";
+import DepDetails from "./pages/DepDetails";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/departments/:collegeCode" element={<Departments />} />
         <Route path="/add-college" element={<AddCollege />} />
         <Route path="/getCollege" element={<CollegeDetails />} />
+        <Route path="/getDeps" element={<DepDetails />} />
 
         <Route path="/departments/:collegeCode/:id" element={<DepartmentDetails />} />
       </Routes>

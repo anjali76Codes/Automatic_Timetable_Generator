@@ -32,7 +32,7 @@ const Departments = () => {
     };
 
     fetchCollegeDetails();
-  }, [collegeCode]);
+  }, [collegeCode]);  // Re-fetch when collegeCode changes
 
   // Handle case where no departments or college data is available
   const totalDepartments = collegeDetails.totalDepartments || 0;
@@ -86,7 +86,7 @@ const Departments = () => {
               className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
             >
               <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                Department {index + 1} {/* Displaying Department 1, 2, 3, etc. */}
+                {departments[index]?.departmentName || `Department ${index + 1}`} {/* Displaying Department 1, 2, 3, etc. */}
               </h3>
               <button
                 onClick={() => handleAddInfoClick(index)} // Navigate to the department details page

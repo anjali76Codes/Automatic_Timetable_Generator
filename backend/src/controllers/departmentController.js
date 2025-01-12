@@ -4,121 +4,43 @@ import mongoose from "mongoose";
 
 // Create department (Already provided)
 export const createDepartment = async (req, res) => {
-  const {
-    departmentName,
-    departmentHOD,
-    totalFaculties,
-    totalClasses,
-    totalLabs,
-    allocatedClasses,
-    allocatedLabs,
-    subjectDetails,
-    semDetails,
-    faculties,
-    collegeId, // Expecting collegeId in the request body
-  } = req.body;
+  const { departmentId, departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, collegeId } = req.body;
 
-  // Input validation
-  if (!departmentName || !departmentHOD || totalFaculties < 0 || totalClasses < 0 || totalLabs < 0) {
-    return res.status(400).json({ message: "Invalid input data" });
+  // Prevent updating a department after it is created
+  if (departmentId) {
+    return res.status(400).json({ message: "Department already created, cannot be updated" });
   }
 
+  // Normal department creation logic
   try {
-    // Create a new department
+    let department = await Department.findOne({ departmentName, collegeId });
+
+    if (department) {
+      return res.status(400).json({ message: "Department already exists for this college" });
+    }
+
     const newDepartment = new Department({
       departmentName,
       departmentHOD,
       totalFaculties,
       totalClasses,
       totalLabs,
-      allocatedClasses,
-      allocatedLabs,
-      subjectDetails,
-      semDetails,
-      faculties,
     });
 
-    // Save the department
-    const savedDepartment = await newDepartment.save();
+    await newDepartment.save();
 
-    // Find the college and add the department's ObjectId to the collegeDepartments array
     const college = await College.findById(collegeId);
-
-    if (!college) {
-      return res.status(404).json({ message: "College not found" });
-    }
-
-    // Add the department's ObjectId to the collegeDepartments array
-    college.collegeDepartments.push(savedDepartment._id);
-
-    // Save the updated college
+    college.collegeDepartments.push(newDepartment._id);
     await college.save();
 
-    // Return a response
-    res.status(201).json({
-      message: "Department created successfully and linked to the college",
-      department: savedDepartment,
-    });
+    res.status(201).json({ message: "Department created successfully", department: newDepartment });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Update department (New function for editing and updating)
-export const updateDepartment = async (req, res) => {
-  const {
-    departmentId, // The departmentId is expected in the URL params
-    departmentName,
-    departmentHOD,
-    totalFaculties,
-    totalClasses,
-    totalLabs,
-    allocatedClasses,
-    allocatedLabs,
-    subjectDetails,
-    semDetails,
-    faculties,
-  } = req.body;
 
-  // Input validation
-  if (!departmentId || !departmentName || !departmentHOD || totalFaculties < 0 || totalClasses < 0 || totalLabs < 0) {
-    return res.status(400).json({ message: "Invalid input data" });
-  }
 
-  try {
-    // Find the department by its ID
-    const department = await Department.findById(departmentId);
-
-    if (!department) {
-      return res.status(404).json({ message: "Department not found" });
-    }
-
-    // Update the department details
-    department.departmentName = departmentName;
-    department.departmentHOD = departmentHOD;
-    department.totalFaculties = totalFaculties;
-    department.totalClasses = totalClasses;
-    department.totalLabs = totalLabs;
-    department.allocatedClasses = allocatedClasses;
-    department.allocatedLabs = allocatedLabs;
-    department.subjectDetails = subjectDetails;
-    department.semDetails = semDetails;
-    department.faculties = faculties;
-
-    // Save the updated department
-    const updatedDepartment = await department.save();
-
-    // Return a response
-    res.status(200).json({
-      message: "Department updated successfully",
-      department: updatedDepartment,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
 
 export const getDepartment = async (req, res) => {
@@ -139,3 +61,28 @@ export const getDepartment = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+// In your departmentController.js file
+
+export const getDepartmentsByCollegeId = async (req, res) => {
+  const { collegeId } = req.params;
+
+  try {
+    // Find all departments for the given collegeId
+    const departments = await Department.find({ collegeId });
+
+    if (departments.length === 0) {
+      return res.status(404).json({ message: "No departments found for this college" });
+    }
+
+    // Return department names (you can modify to return more details if necessary)
+    const departmentNames = departments.map(department => department.departmentName);
+
+    res.status(200).json({ departmentNames });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
