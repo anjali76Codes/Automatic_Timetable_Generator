@@ -1,40 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 function Home() {
     const navigate = useNavigate();
+    const [username, setUsername] = useState(localStorage.getItem('username')); // Retrieve username from localStorage
 
-    // Retrieve the username and token from local storage
-    const username = localStorage.getItem('username');
+    // Retrieve the token from local storage
     const token = localStorage.getItem('token');
 
-    // Redirect to signin page if no token (not logged in)
+    // Function to check if the token is expired
+    const isTokenExpired = (token) => {
+        if (!token) return true; // If no token, consider it expired
+        try {
+            const decoded = jwtDecode(token);
+            const currentTime = Date.now() / 1000; // Current time in seconds
+            return decoded.exp < currentTime; // Check if the token is expired
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return true; // In case decoding fails, consider it expired
+        }
+    };
+
+    // Redirect to signin page if no token or token is expired
     useEffect(() => {
-        if (!token) {
-            navigate('/signin'); // Redirect to sign-in page if not logged in
+        if (!token || isTokenExpired(token)) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            navigate('/signin'); // Redirect to sign-in page if token is expired or missing
         }
     }, [token, navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Clear token from local storage
         localStorage.removeItem('username'); // Clear username from local storage
+        setUsername(null); // Reset username state
+        window.dispatchEvent(new Event('storage')); // Dispatch event to notify other components (like Navbar)
         navigate('/signin'); // Navigate to signin page
     };
 
-    // If there's no username (meaning not logged in), show guest
-    const displayName = username || 'Guest';
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h1 className="text-3xl font-bold text-purple-700 mb-6">Home</h1>
-                <p className="mb-4">Welcome, {displayName}!</p>
-                <button
-                    onClick={handleLogout}
-                    className="bg-purple-600 text-white p-3 rounded-lg shadow hover:bg-purple-700 transition duration-300"
-                >
-                    Logout
-                </button>
+                {username ? (
+                    <p className="mb-4">Welcome, {username}!</p>
+                ) : (
+                    <p className="mb-4">You are logged in!</p>
+                )}
             </div>
         </div>
     );
