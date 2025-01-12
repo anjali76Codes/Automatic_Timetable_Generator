@@ -32,6 +32,11 @@ const collegeSchema = new Schema(
             required: true,
             min: [0, "Total labs cannot be negative"]
         },
+        totalFloors: {
+            type: Number,
+            required: true,
+            min: [0, "Total floors cannot be negative"]
+        },
         totalFaculties: {
             type: Number,
             required: true,
@@ -42,8 +47,11 @@ const collegeSchema = new Schema(
             required: true,
             min: [0, "Total departments cannot be negative"]
         },
-
-        // Reference to other collection (Department model)
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "User", // This references the User model
+            required: true,
+        },
         collegeDepartments: [
             {
                 type: Schema.Types.ObjectId,

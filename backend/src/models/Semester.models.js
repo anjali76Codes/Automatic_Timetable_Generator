@@ -49,7 +49,7 @@ const semesterSchema = new Schema(
 
                                 batches: [
                                     {
-                                        batchNo: {
+                                        batchName: {
                                             type: String,
                                             required: true
                                         },

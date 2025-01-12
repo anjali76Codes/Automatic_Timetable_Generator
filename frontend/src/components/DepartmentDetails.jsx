@@ -4,6 +4,7 @@ import BasicInformation from '../pages/BasicInformation';
 import Subjects from '../pages/Subjects'; // Importing the Subjects component
 import RoomAllocation from '../pages/RoomAllocation';
 import Faculties from '../pages/Faculties'
+import SemInfo from '../pages/SemInfo';
 
 const DepartmentDetails = () => {
   const { id } = useParams();
@@ -71,7 +72,7 @@ const DepartmentDetails = () => {
           {activeTab === 'sem-info' && (
             <div>
               <h2 className="text-xl font-semibold text-gray-700">Sem Info</h2>
-              {/* Display sem info */}
+              <SemInfo />
             </div>
           )}
           {activeTab === 'room-allocations' && (
