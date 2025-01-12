@@ -1,6 +1,8 @@
 import { User } from "../models/user.models.js";
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { College } from "../models/college.models.js";
 
 // SignUp Controller
 const signup = async (req, res) => {
@@ -68,5 +70,55 @@ const signin = async (req, res) => {
     }
 };
 
+const getUserColleges = async (req, res) => {
+    try {
+        // Get token from Authorization header
+        const token = req.header('Authorization').replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ message: 'Authorization token is required' });
+        }
 
-export { signup, signin };
+        // Verify token and get the userId
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Find the user by ID and populate the colleges field
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Return the colleges associated with the user
+        res.status(200).json({ colleges: user.colleges });
+
+    } catch (error) {
+        console.error('Error fetching colleges:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+// Controller to fetch college details by ID
+const getCollegeDetails = async (req, res) => {
+    const { collegeId } = req.params; // Extract collegeId from request parameters
+
+    try {
+        // Fetch the college details from the database
+        const college = await College.findById(collegeId);
+
+        if (!college) {
+            return res.status(404).json({ message: 'College not found' });
+        }
+
+        // Return the college details
+        res.status(200).json(college);
+
+    } catch (error) {
+        console.error('Error fetching college details:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+export { signup, signin, getUserColleges, getCollegeDetails };
