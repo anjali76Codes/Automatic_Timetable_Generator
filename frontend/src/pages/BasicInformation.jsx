@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const BasicInformation = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,41 @@ const BasicInformation = () => {
     totalLabs: '',
     totalStudents: '',
   });
+  const [collegeId, setCollegeId] = useState(null); // Store the college ID
   const [isSaved, setIsSaved] = useState(false); // Track if information is saved
   const [error, setError] = useState(""); // Track any errors
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    const fetchCollegeId = async () => {
+      try {
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        const response = await axios.get(
+          'http://localhost:3000/api/v1/timetable/colleges', // Get college data associated with user
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data && response.data.colleges && response.data.colleges.length > 0) {
+          // Assuming you get the list of colleges and pick the first one
+          setCollegeId(response.data.colleges[0]); // Set collegeId (change logic based on your structure)
+        } else {
+          throw new Error('No college found for the user');
+        }
+      } catch (error) {
+        setError('Error fetching college data: ' + error.message);
+      }
+    };
+
+    fetchCollegeId();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +57,15 @@ const BasicInformation = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!collegeId) {
+      setError('College ID is missing');
+      return;
+    }
+
     const apiUrl = "http://localhost:3000/api/departments";
+
+    // Log department details to the console
+    console.log("Department details:", formData);
 
     try {
       const response = await fetch(apiUrl, {
@@ -33,7 +75,7 @@ const BasicInformation = () => {
         },
         body: JSON.stringify({
           ...formData,
-          collegeId: "your_college_id", // Replace with the actual college ID
+          collegeId: collegeId, // Include the fetched collegeId
         }),
       });
 
@@ -44,7 +86,7 @@ const BasicInformation = () => {
       const result = await response.json();
       alert("Department information saved successfully");
       setIsSaved(true); // Mark as saved
-      console.log("Result: ", result);
+      console.log("Response result: ", result); // Log the response from the API
     } catch (error) {
       setError("Error saving information: " + error.message);
     }
