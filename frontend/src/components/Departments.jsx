@@ -1,30 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const Departments = () => {
   const navigate = useNavigate();
-  const { collegeCode } = useParams();  // Get collegeCode from URL
+  const { collegeCode } = useParams(); // Get collegeCode from URL
   const [collegeDetails, setCollegeDetails] = useState({});
+  const [departmentDetails, setDepartmentDetails] = useState({}); // Store department details
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Loading state for departments
 
   useEffect(() => {
     // Fetching college details using the collegeCode from the URL
     const fetchCollegeDetails = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/v1/timetable/college/${collegeCode}`,
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/timetable/college/${collegeCode}`, // Get college details
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`, // Include token in header
             },
           }
         );
-        const result = await response.json();
 
-        if (response.ok) {
-          setCollegeDetails(result.message); // Assuming message contains the college details
-        } else {
-          setError(result.message || "An error occurred");
+        if (response.data) {
+          setCollegeDetails(response.data.message); // Assuming message contains the college details
+          const departmentIds = response.data.message.collegeDepartments; // Extract department IDs
+          fetchDepartmentDetails(departmentIds); // Fetch department details using department IDs
         }
       } catch (err) {
         setError("Failed to fetch data");
@@ -32,15 +34,51 @@ const Departments = () => {
     };
 
     fetchCollegeDetails();
-  }, [collegeCode]);  // Re-fetch when collegeCode changes
+  }, [collegeCode]); // Re-fetch when collegeCode changes
 
-  // Handle case where no departments or college data is available
+  // Function to fetch department details
+  const fetchDepartmentDetails = async (departmentIds) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/departments/departments/details", // Get departments details by IDs
+        { departmentIds },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        const departmentMap = {};
+        response.data.forEach((department) => {
+          departmentMap[department._id] = department;
+        });
+        setDepartmentDetails(departmentMap); // Map department details to their IDs
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError("Failed to fetch department details");
+      setIsLoading(false);
+    }
+  };
+
   const totalDepartments = collegeDetails.totalDepartments || 0;
-  const departments = collegeDetails.departments || [];
+  const departments = collegeDetails.collegeDepartments || [];
 
-  const handleAddInfoClick = (index) => {
-    navigate(`/departments/${collegeCode}/${index}`, {
-      state: { department: departments[index] }, // Pass department info to the next page
+  // Create a filled list of departments
+  const filledDepartments = [...departments];
+
+  // If the number of departments is less than totalDepartments, add missing departments
+  for (let i = departments.length; i < totalDepartments; i++) {
+    filledDepartments.push(`Department ${i + 1}`); // Add default names like "Department 1", "Department 2", etc.
+  }
+
+  const handleAddInfoClick = (departmentId) => {
+    const department = departmentDetails[departmentId];
+    // Navigating to the department details page with the correct URL
+    navigate(`/departments/${collegeCode}/${departmentId}`, {
+      state: { department }, // Pass department info to the next page
     });
   };
 
@@ -80,22 +118,31 @@ const Departments = () => {
           <div className="text-red-600 text-center mb-4">{error}</div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {Array.from({ length: totalDepartments }, (_, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
-            >
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                {departments[index]?.departmentName || `Department ${index + 1}`} {/* Displaying Department 1, 2, 3, etc. */}
-              </h3>
-              <button
-                onClick={() => handleAddInfoClick(index)} // Navigate to the department details page
-                className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
-              >
-                Add Info <span className="ml-2">+</span>
-              </button>
-            </div>
-          ))}
+          {isLoading ? (
+            <div>Loading departments...</div>
+          ) : (
+            filledDepartments.map((departmentId, index) => {
+              // Check if it's a default department name or an actual department object
+              const department = departmentDetails[departmentId] || { departmentName: `Department ${index + 1}` }; // Fallback for undefined department
+
+              return (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
+                >
+                  <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                    {department ? department.departmentName : `Department ${index + 1}`}
+                  </h3>
+                  <button
+                    onClick={() => handleAddInfoClick(departmentId)} // Navigate to department details page
+                    className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
+                  >
+                    Add Info <span className="ml-2">+</span>
+                  </button>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>
