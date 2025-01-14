@@ -73,12 +73,11 @@ const Departments = () => {
   for (let i = departments.length; i < totalDepartments; i++) {
     filledDepartments.push(`Department ${i + 1}`); // Add default names like "Department 1", "Department 2", etc.
   }
-
-  const handleAddInfoClick = (departmentId) => {
-    const department = departmentDetails[departmentId];
+  const handleAddInfoClick = (departmentId, index) => {
+    const department = departmentDetails[departmentId] || { departmentName: `Department ${index + 1}` }; // Fallback to dynamic name
     // Navigating to the department details page with the correct URL
     navigate(`/departments/${collegeCode}/${departmentId}`, {
-      state: { department }, // Pass department info to the next page
+      state: { departmentName: department.departmentName }, // Pass the department name to the next page
     });
   };
 
@@ -134,7 +133,7 @@ const Departments = () => {
                     {department ? department.departmentName : `Department ${index + 1}`}
                   </h3>
                   <button
-                    onClick={() => handleAddInfoClick(departmentId)} // Navigate to department details page
+                    onClick={() => handleAddInfoClick(departmentId, index)} // Pass index to handleAddInfoClick
                     className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
                   >
                     Add Info <span className="ml-2">+</span>
@@ -147,6 +146,7 @@ const Departments = () => {
       </div>
     </div>
   );
+
 };
 
 export default Departments;

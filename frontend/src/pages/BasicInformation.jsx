@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const BasicInformation = () => {
+const BasicInformation = ({ departmentName, departmentId }) => {  // Receive departmentName as a prop
   const [formData, setFormData] = useState({
-    departmentName: '',
+    departmentName: departmentName,  // Use departmentName here
     departmentHOD: '',
     totalFaculties: '',
     totalClasses: '',
@@ -13,6 +13,7 @@ const BasicInformation = () => {
   const [collegeId, setCollegeId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState("");
+  const [departmentDetails, setDepartmentDetails] = useState(null); // State for storing department details
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -38,6 +39,27 @@ const BasicInformation = () => {
 
     fetchCollegeId();
   }, []);
+
+  // New useEffect to fetch department details based on departmentId
+  useEffect(() => {
+    const fetchDepartmentDetails = async () => {
+      if (departmentId) {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/departments/departments/${departmentId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
+          setDepartmentDetails(response.data);
+          console.log('Department Details:', response.data);  // Log department details to console
+        } catch (error) {
+          console.error('Error fetching department details:', error);
+        }
+      }
+    };
+
+    fetchDepartmentDetails();
+  }, [departmentId]); // Fetch department details only when departmentId changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;

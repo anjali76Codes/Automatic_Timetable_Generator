@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import BasicInformation from '../pages/BasicInformation';
-import Subjects from '../pages/Subjects'; // Importing the Subjects component
+import Subjects from '../pages/Subjects';
 import RoomAllocation from '../pages/RoomAllocation';
-import Faculties from '../pages/Faculties'
+import Faculties from '../pages/Faculties';
 import SemInfo from '../pages/SemInfo';
 
 const DepartmentDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams();  // Get the department ID from the URL params
+  const { state } = useLocation(); // Access location state to get departmentName
   const [activeTab, setActiveTab] = useState('basic-info'); // Default tab is 'basic-info'
 
   const handleTabChange = (tab) => {
     setActiveTab(tab); // Change the active tab when a new one is clicked
   };
 
+  // Get the department name passed in the state
+  const departmentName = state?.departmentName || `Department ${parseInt(id) + 1}`; // Fallback if no department name
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 py-12 px-6 flex">
       {/* Sidebar */}
       <div className="w-1/4 bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-2xl font-semibold text-gray-700 mb-6">Department {parseInt(id) + 1}</h3>
+        <h3 className="text-2xl font-semibold text-gray-700 mb-6">{departmentName}</h3> {/* Display department name */}
         <ul className="space-y-4">
           <li>
             <button
@@ -66,9 +70,9 @@ const DepartmentDetails = () => {
       {/* Main content area */}
       <div className="w-3/4 ml-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
-          {activeTab === 'basic-info' && <BasicInformation />} {/* Render BasicInformation component for 'basic-info' tab */}
-          {activeTab === 'subjects' && <Subjects />} {/* Render Subjects component for 'subjects' tab */}
-          {activeTab === 'faculties' && <Faculties />} {/* Render Subjects component for 'subjects' tab */}
+          {activeTab === 'basic-info' && <BasicInformation departmentName={departmentName} departmentId={id} />} {/* Pass departmentId (from useParams) as prop */}
+          {activeTab === 'subjects' && <Subjects />}
+          {activeTab === 'faculties' && <Faculties />}
           {activeTab === 'sem-info' && (
             <div>
               <h2 className="text-xl font-semibold text-gray-700">Sem Info</h2>
@@ -79,7 +83,6 @@ const DepartmentDetails = () => {
             <div>
               <h2 className="text-xl font-semibold text-gray-700">Room Allocations</h2>
               <RoomAllocation />
-              {/* Display faculties info */}
             </div>
           )}
         </div>

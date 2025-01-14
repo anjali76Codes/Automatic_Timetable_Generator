@@ -58,7 +58,7 @@ const CollegeDetails = () => {
     const fetchDepartmentDetails = async (departmentIds) => {
         try {
             const response = await axios.post(
-                'http://localhost:3000/api/v1/timetable/departments/details',
+                'http://localhost:3000/api/departments/departments/details',
                 { departmentIds },
                 {
                     headers: {
