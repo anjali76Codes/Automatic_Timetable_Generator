@@ -47,6 +47,7 @@ app.use("/api", userRouter);
 // Routes
 app.use("/api/departments", departmentRoutes);
 
+
 // once we have /testing, entire control is handled by testingRouter
 
 

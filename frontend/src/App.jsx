@@ -22,7 +22,7 @@ function App() {
         <Route path="/departments/:collegeCode" element={<Departments />} />
         <Route path="/add-college" element={<AddCollege />} />
         <Route path="/getCollege" element={<CollegeDetails />} />
-        <Route path="/getDeps" element={<DepDetails />} />
+        {/* <Route path="/getDeps" element={<DepDetails />} /> */}
 
         <Route path="/departments/:collegeCode/:id" element={<DepartmentDetails />} />
       </Routes>

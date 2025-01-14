@@ -22,6 +22,10 @@ const departmentSchema = Schema(
             type: Number,
             min: [0, "Total labs cannot be negative"]
         },
+        totalStudents: {
+            type: Number,
+            min: [0, "Total students cannot be negative"]
+        },
         allocatedClasses: [
             {
                 floor: {
