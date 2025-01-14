@@ -6,7 +6,7 @@ const Departments = () => {
   const navigate = useNavigate();
   const { collegeCode } = useParams(); // Get collegeCode from URL
   const [collegeDetails, setCollegeDetails] = useState({});
-  const [departmentDetails, setDepartmentDetails] = useState({}); // Store department details
+  const [departmentDetails, setDepartmentDetails] = useState({});
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Loading state for departments
 
@@ -30,6 +30,7 @@ const Departments = () => {
         }
       } catch (err) {
         setError("Failed to fetch data");
+        setIsLoading(false);
       }
     };
 
@@ -63,6 +64,10 @@ const Departments = () => {
     }
   };
 
+  const handleNavigate = (departmentId, departmentName) => {
+    navigate(`/basic-info/${departmentId}`, { state: { departmentName } });
+  };
+
   const totalDepartments = collegeDetails.totalDepartments || 0;
   const departments = collegeDetails.collegeDepartments || [];
 
@@ -73,6 +78,7 @@ const Departments = () => {
   for (let i = departments.length; i < totalDepartments; i++) {
     filledDepartments.push(`Department ${i + 1}`); // Add default names like "Department 1", "Department 2", etc.
   }
+
   const handleAddInfoClick = (departmentId, index) => {
     const department = departmentDetails[departmentId] || { departmentName: `Department ${index + 1}` }; // Fallback to dynamic name
     // Navigating to the department details page with the correct URL
@@ -121,22 +127,24 @@ const Departments = () => {
             <div>Loading departments...</div>
           ) : (
             filledDepartments.map((departmentId, index) => {
-              // Check if it's a default department name or an actual department object
               const department = departmentDetails[departmentId] || { departmentName: `Department ${index + 1}` }; // Fallback for undefined department
-
               return (
                 <div
                   key={index}
                   className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
                 >
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                    {department ? department.departmentName : `Department ${index + 1}`}
+                    {department.departmentName}
                   </h3>
                   <button
-                    onClick={() => handleAddInfoClick(departmentId, index)} // Pass index to handleAddInfoClick
-                    className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
+                    onClick={() => handleAddInfoClick(departmentId, index)}
+                    className={`mt-4 ${
+                      departmentDetails[departmentId]
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    } text-white px-6 py-2 rounded-lg font-bold transition`}
                   >
-                    Add Info <span className="ml-2">+</span>
+                    {departmentDetails[departmentId] ? "View Details" : "Add Info"}
                   </button>
                 </div>
               );
@@ -146,7 +154,6 @@ const Departments = () => {
       </div>
     </div>
   );
-
 };
 
 export default Departments;

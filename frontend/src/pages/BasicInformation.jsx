@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const BasicInformation = ({ departmentName, departmentId }) => {  // Receive departmentName as a prop
+const BasicInformation = ({ departmentId }) => {
   const [formData, setFormData] = useState({
-    departmentName: departmentName,  // Use departmentName here
+    departmentName: '',
     departmentHOD: '',
     totalFaculties: '',
     totalClasses: '',
@@ -12,9 +13,11 @@ const BasicInformation = ({ departmentName, departmentId }) => {  // Receive dep
   });
   const [collegeId, setCollegeId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [error, setError] = useState("");
-  const [departmentDetails, setDepartmentDetails] = useState(null); // State for storing department details
+  const [error, setError] = useState('');
+  const [departmentDetails, setDepartmentDetails] = useState(null);
+  const navigate = useNavigate();
 
+  // Fetch College ID
   useEffect(() => {
     const token = localStorage.getItem('token');
     const fetchCollegeId = async () => {
@@ -40,26 +43,38 @@ const BasicInformation = ({ departmentName, departmentId }) => {  // Receive dep
     fetchCollegeId();
   }, []);
 
-  // New useEffect to fetch department details based on departmentId
+  // Fetch Department Details
   useEffect(() => {
     const fetchDepartmentDetails = async () => {
       if (departmentId) {
         try {
-          const response = await axios.get(`http://localhost:3000/api/departments/departments/${departmentId}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+          const response = await axios.get(
+            `http://localhost:3000/api/departments/departments/${departmentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            }
+          );
+          const departmentData = response.data.department;
+          setFormData({
+            departmentName: departmentData.departmentName || '',
+            departmentHOD: departmentData.departmentHOD || '',
+            totalFaculties: departmentData.totalFaculties || '',
+            totalClasses: departmentData.totalClasses || '',
+            totalLabs: departmentData.totalLabs || '',
+            totalStudents: departmentData.totalStudents || '',
           });
-          setDepartmentDetails(response.data);
-          console.log('Department Details:', response.data);  // Log department details to console
+          setIsSaved(true); // Mark as saved
+          setDepartmentDetails(departmentData);
         } catch (error) {
           console.error('Error fetching department details:', error);
+          setError('Failed to fetch department details.');
         }
       }
     };
-
     fetchDepartmentDetails();
-  }, [departmentId]); // Fetch department details only when departmentId changes
+  }, [departmentId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +122,7 @@ const BasicInformation = ({ departmentName, departmentId }) => {  // Receive dep
   };
 
   const handleEdit = () => {
-    setIsSaved(false); // Allow editing again (if you decide to revert this behavior)
+    setIsSaved(false); // Allow editing again
   };
 
   // Display saved details and disable form fields when isSaved is true
@@ -125,6 +140,12 @@ const BasicInformation = ({ departmentName, departmentId }) => {  // Receive dep
           <p><strong>Total Labs:</strong> {formData.totalLabs}</p>
           <p><strong>Total Students:</strong> {formData.totalStudents}</p>
         </div>
+        <button
+          onClick={handleEdit} // Allow editing
+          className="mt-4 px-6 py-3 bg-blue-500 text-white text-lg rounded-lg"
+        >
+          Edit Information
+        </button>
       </div>
     );
   }
