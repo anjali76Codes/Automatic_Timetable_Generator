@@ -38,15 +38,18 @@ import testingRouter from "./routes/testing.routes.js";
 import collegeRouter from "./routes/college.routes.js"
 import userRouter from "./routes/user.routes.js";
 import departmentRoutes from './routes/department.routes.js';
+import subjectRouter from "./routes/subject.routes.js"
 
 
 // create routes
 app.use("/api/v1/testing", testingRouter);
+
+
 app.use("/api/v1/timetable", collegeRouter);
 app.use("/api", userRouter);
 // Routes
 app.use("/api/departments", departmentRoutes);
-
+app.use("/api/v1/subject", subjectRouter);
 
 // once we have /testing, entire control is handled by testingRouter
 

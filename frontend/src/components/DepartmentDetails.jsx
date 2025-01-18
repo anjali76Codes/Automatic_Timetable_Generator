@@ -71,7 +71,7 @@ const DepartmentDetails = () => {
       <div className="w-3/4 ml-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           {activeTab === 'basic-info' && <BasicInformation departmentName={departmentName} departmentId={id} />} {/* Pass departmentId (from useParams) as prop */}
-          {activeTab === 'subjects' && <Subjects />}
+          {activeTab === 'subjects' && <Subjects departmentName={departmentName} departmentId={id} />}
           {activeTab === 'faculties' && <Faculties />}
           {activeTab === 'sem-info' && (
             <div>

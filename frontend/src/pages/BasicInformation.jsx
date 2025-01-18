@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import mongoose from 'mongoose';
 
 const BasicInformation = ({ departmentId }) => {
   const [formData, setFormData] = useState({
@@ -48,6 +49,12 @@ const BasicInformation = ({ departmentId }) => {
     const fetchDepartmentDetails = async () => {
       if (departmentId) {
         try {
+          // Check if departmentId is a valid ObjectId before making the API call
+          if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+            setError('Invalid department ID');
+            return;
+          }
+
           const response = await axios.get(
             `http://localhost:3000/api/departments/departments/${departmentId}`,
             {
@@ -76,6 +83,7 @@ const BasicInformation = ({ departmentId }) => {
     fetchDepartmentDetails();
   }, [departmentId]);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -92,19 +100,21 @@ const BasicInformation = ({ departmentId }) => {
       return;
     }
 
-    const apiUrl = "http://localhost:3000/api/departments";
-    const departmentId = isSaved ? formData.departmentId : null;
+    const apiUrl = departmentId
+      ? `http://localhost:3000/api/departments/departments/${departmentId}` // Use PUT for updating
+      : `http://localhost:3000/api/departments`; // Use POST for creating
+
+    const method = departmentId ? "PUT" : "POST";  // PUT if departmentId exists (update), POST if creating
 
     try {
       const response = await fetch(apiUrl, {
-        method: departmentId ? "PUT" : "POST",
+        method, // PUT or POST depending on the departmentId
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
           collegeId: collegeId,
-          departmentId: departmentId,
         }),
       });
 
@@ -120,6 +130,9 @@ const BasicInformation = ({ departmentId }) => {
       setError("Error saving information: " + error.message);
     }
   };
+
+
+
 
   const handleEdit = () => {
     setIsSaved(false); // Allow editing again

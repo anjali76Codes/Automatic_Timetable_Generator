@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const Subjects = () => {
+const Subjects = ({ departmentId }) => {
   // State for dropdowns and other form elements
-  const [semesterType, setSemesterType] = useState('odd'); // 'odd' or 'even'
+  const [semesterType, setSemesterType] = useState('odd');
   const [semester, setSemester] = useState('');
   const [subjectName, setSubjectName] = useState('');
-  const [subjectType, setSubjectType] = useState('class'); // 'class', 'lab', or 'both'
+  const [subjectType, setSubjectType] = useState('class');
   const [subjectsList, setSubjectsList] = useState([]);
 
   // Semesters based on type (odd/even)
@@ -15,7 +16,7 @@ const Subjects = () => {
   // Handle semester type change
   const handleSemesterTypeChange = (e) => {
     setSemesterType(e.target.value);
-    setSemester(''); // Reset semester selection
+    setSemester(''); // Reset semester selection when semester type changes
   };
 
   // Handle subject type (class, lab, both) change
@@ -29,24 +30,42 @@ const Subjects = () => {
   };
 
   // Handle subject save (add subject to list)
-  const handleAddSubject = () => {
+  const handleAddSubject = async () => {
     if (!subjectName || !semester || !subjectType) {
       alert('Please fill all fields');
       return;
     }
 
     const newSubject = {
-      subjectName,
+      departmentId,  // Add departmentId here
+      semesterType: semesterType.charAt(0).toUpperCase() + semesterType.slice(1), // Convert to 'Odd' or 'Even'
       semester,
-      subjectType
+      subjectName,
+      subjectType,
     };
 
-    setSubjectsList([...subjectsList, newSubject]);
-    setSubjectName('');
+    try {
+      // Send POST request to API to save subject
+      const response = await axios.post('http://localhost:3000/api/v1/subject/add-subject', newSubject);
+      alert(response.data.message); // Show success message
+
+      // Add subject to the subjects list
+      setSubjectsList((prevSubjects) => [
+        ...prevSubjects,
+        newSubject,
+      ]);
+
+      // Clear input fields after successful submission
+      setSubjectName('');
+    } catch (error) {
+      alert('Error adding subject');
+    }
   };
 
   // Filtered subjects based on selected semester
-  const filteredSubjects = subjectsList.filter(subject => subject.semester === semester);
+  const filteredSubjects = subjectsList.filter(
+    (subject) => subject.semester === semester
+  );
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
@@ -75,9 +94,13 @@ const Subjects = () => {
           disabled={!semesterType} // Disable if semesterType is not selected
         >
           <option value="">Select a Semester</option>
-          {(semesterType === 'odd' ? oddSemesters : evenSemesters).map((sem, idx) => (
-            <option key={idx} value={sem}>{sem}</option>
-          ))}
+          {(semesterType === 'odd' ? oddSemesters : evenSemesters).map(
+            (sem, idx) => (
+              <option key={idx} value={sem}>
+                {sem}
+              </option>
+            )
+          )}
         </select>
       </div>
 
@@ -143,7 +166,9 @@ const Subjects = () => {
 
       {/* Display Added Subjects for the selected semester */}
       <div className="mt-8">
-        <h3 className="text-2xl font-semibold text-gray-700 mb-4">Added Subjects for {semester}</h3>
+        <h3 className="text-2xl font-semibold text-gray-700 mb-4">
+          Added Subjects for {semester}
+        </h3>
         {filteredSubjects.length === 0 ? (
           <p>No subjects added for this semester yet.</p>
         ) : (
@@ -159,10 +184,16 @@ const Subjects = () => {
                 <td className="border-t px-4 py-2">
                   <ul>
                     {filteredSubjects
-                      .filter(subject => subject.subjectType === 'class' || subject.subjectType === 'both')
+                      .filter(
+                        (subject) =>
+                          subject.subjectType === 'class' ||
+                          subject.subjectType === 'both'
+                      )
                       .map((subject, idx) => (
                         <li key={idx} className="p-2">
-                          <h4 className="text-lg font-semibold text-gray-800">{subject.subjectName}</h4>
+                          <h4 className="text-lg font-semibold text-gray-800">
+                            {subject.subjectName}
+                          </h4>
                           <p className="text-gray-600">Semester: {subject.semester}</p>
                         </li>
                       ))}
@@ -171,10 +202,15 @@ const Subjects = () => {
                 <td className="border-t px-4 py-2">
                   <ul>
                     {filteredSubjects
-                      .filter(subject => subject.subjectType === 'lab' || subject.subjectType === 'both')
+                      .filter(
+                        (subject) =>
+                          subject.subjectType === 'lab' || subject.subjectType === 'both'
+                      )
                       .map((subject, idx) => (
                         <li key={idx} className="p-2">
-                          <h4 className="text-lg font-semibold text-gray-800">{'L-' + subject.subjectName}</h4>
+                          <h4 className="text-lg font-semibold text-gray-800">
+                            {'L-' + subject.subjectName}
+                          </h4>
                           <p className="text-gray-600">Semester: {subject.semester}</p>
                         </li>
                       ))}
