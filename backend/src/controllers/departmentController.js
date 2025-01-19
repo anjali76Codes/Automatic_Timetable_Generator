@@ -126,12 +126,15 @@ export const updateDepartment = async (req, res) => {
   }
 
   try {
+    // Find the department by ID
     let department = await Department.findById(departmentId);
 
+    // If department is not found
     if (!department) {
       return res.status(404).json({ message: "Department not found" });
     }
 
+    // Update department fields
     department.departmentName = departmentName || department.departmentName;
     department.departmentHOD = departmentHOD || department.departmentHOD;
     department.totalFaculties = totalFaculties || department.totalFaculties;
@@ -139,11 +142,14 @@ export const updateDepartment = async (req, res) => {
     department.totalLabs = totalLabs || department.totalLabs;
     department.totalStudents = totalStudents || department.totalStudents;
 
+    // Save the updated department
     await department.save();
 
+    // Return the updated department details
     res.status(200).json({ message: "Department updated successfully", department });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to update department", error: error.message });
   }
 };
+

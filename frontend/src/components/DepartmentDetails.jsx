@@ -29,9 +29,8 @@ const DepartmentDetails = () => {
           <li>
             <button
               onClick={() => handleTabChange('basic-info')}
-              className={`w-full text-left py-2 px-4 rounded-lg ${
-                activeTab === 'basic-info' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-              }`}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'basic-info' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
             >
               Basic Information
             </button>
@@ -39,9 +38,8 @@ const DepartmentDetails = () => {
           <li>
             <button
               onClick={() => handleTabChange('subjects')}
-              className={`w-full text-left py-2 px-4 rounded-lg ${
-                activeTab === 'subjects' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-              }`}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'subjects' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
             >
               Subjects
             </button>
@@ -49,9 +47,8 @@ const DepartmentDetails = () => {
           <li>
             <button
               onClick={() => handleTabChange('sem-info')}
-              className={`w-full text-left py-2 px-4 rounded-lg ${
-                activeTab === 'sem-info' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-              }`}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'sem-info' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
             >
               Sem Info
             </button>
@@ -59,9 +56,8 @@ const DepartmentDetails = () => {
           <li>
             <button
               onClick={() => handleTabChange('room-allocations')}
-              className={`w-full text-left py-2 px-4 rounded-lg ${
-                activeTab === 'room-allocations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-              }`}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'room-allocations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
             >
               Room Allocations
             </button>
@@ -69,9 +65,8 @@ const DepartmentDetails = () => {
           <li>
             <button
               onClick={() => handleTabChange('faculties')}
-              className={`w-full text-left py-2 px-4 rounded-lg ${
-                activeTab === 'faculties' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-              }`}
+              className={`w-full text-left py-2 px-4 rounded-lg ${activeTab === 'faculties' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
             >
               Faculties
             </button>
