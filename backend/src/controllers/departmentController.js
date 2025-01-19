@@ -1,4 +1,3 @@
-
 import { Department } from "../models/department.models.js";
 import { College } from "../models/college.models.js";
 import mongoose from "mongoose";
@@ -115,3 +114,36 @@ export const getDepartmentDetails = async (req, res) => {
 };
 
 
+
+// Controller to update department information
+export const updateDepartment = async (req, res) => {
+  const { departmentId } = req.params;
+  const { departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents } = req.body;
+
+  // Check if the departmentId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+    return res.status(400).json({ message: "Invalid department ID" });
+  }
+
+  try {
+    let department = await Department.findById(departmentId);
+
+    if (!department) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+
+    department.departmentName = departmentName || department.departmentName;
+    department.departmentHOD = departmentHOD || department.departmentHOD;
+    department.totalFaculties = totalFaculties || department.totalFaculties;
+    department.totalClasses = totalClasses || department.totalClasses;
+    department.totalLabs = totalLabs || department.totalLabs;
+    department.totalStudents = totalStudents || department.totalStudents;
+
+    await department.save();
+
+    res.status(200).json({ message: "Department updated successfully", department });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update department", error: error.message });
+  }
+};

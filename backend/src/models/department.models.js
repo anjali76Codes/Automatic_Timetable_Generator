@@ -50,21 +50,18 @@ const departmentSchema = Schema(
                 ]
             }
         ],
-
         subjectDetails: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Subject",
             }
         ],
-
         semDetails: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Semester"
             }
         ],
-
         faculties: [
             {
                 type: Schema.Types.ObjectId,
@@ -72,6 +69,7 @@ const departmentSchema = Schema(
             }
         ]
     }
-)
+);
 
-export const Department = mongoose.model("Department", departmentSchema);
+// Check if the model is already defined to avoid overwriting
+export const Department = mongoose.models.Department || mongoose.model("Department", departmentSchema);

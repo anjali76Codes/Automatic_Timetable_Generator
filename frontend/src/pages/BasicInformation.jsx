@@ -48,14 +48,11 @@ const BasicInformation = ({ departmentId }) => {
     const fetchDepartmentDetails = async () => {
       if (departmentId) {
         try {
-          const response = await axios.get(
-            `http://localhost:3000/api/departments/departments/${departmentId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
-            }
-          );
+          const response = await axios.get(`http://localhost:3000/api/departments/departments/${departmentId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
           const departmentData = response.data.department;
           setFormData({
             departmentName: departmentData.departmentName || '',
@@ -92,14 +89,15 @@ const BasicInformation = ({ departmentId }) => {
       return;
     }
 
-    const apiUrl = "http://localhost:3000/api/departments";
-    const departmentId = isSaved ? formData.departmentId : null;
+    const apiUrl = departmentId
+      ? `http://localhost:3000/api/departments/departments/${departmentId}`
+      : 'http://localhost:3000/api/departments';  // for new department
 
     try {
       const response = await fetch(apiUrl, {
-        method: departmentId ? "PUT" : "POST",
+        method: departmentId ? 'PUT' : 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
@@ -109,15 +107,15 @@ const BasicInformation = ({ departmentId }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit data");
+        throw new Error('Failed to submit data');
       }
 
       const result = await response.json();
-      alert("Department information saved successfully");
+      alert('Department information saved successfully');
       setIsSaved(true);
-      setFormData(result.department);
+      setFormData(result.department); // Set form data with the saved department
     } catch (error) {
-      setError("Error saving information: " + error.message);
+      setError('Error saving information: ' + error.message);
     }
   };
 
