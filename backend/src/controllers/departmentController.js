@@ -1,4 +1,3 @@
-
 import { Department } from "../models/department.models.js";
 import { College } from "../models/college.models.js";
 import mongoose from "mongoose";
@@ -45,26 +44,24 @@ export const createDepartment = async (req, res) => {
 
 
 export const getDepartment = async (req, res) => {
-  const { departmentId } = req.params;
-
-  // Check if the departmentId is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
-    return res.status(400).json({ message: "Invalid department ID" });
-  }
+  const { departmentId } = req.params; // Get departmentId from URL parameters
 
   try {
+    // Find the department by ID
     const department = await Department.findById(departmentId);
 
     if (!department) {
       return res.status(404).json({ message: "Department not found" });
     }
 
+    // Return the department data
     res.status(200).json({ department });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // In your departmentController.js file
 
@@ -115,8 +112,6 @@ export const getDepartmentDetails = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch department details' });
   }
 };
-
-
 
 
 

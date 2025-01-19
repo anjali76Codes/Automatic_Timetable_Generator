@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import mongoose from 'mongoose';
 
 const BasicInformation = ({ departmentId }) => {
   const [formData, setFormData] = useState({
@@ -49,20 +48,11 @@ const BasicInformation = ({ departmentId }) => {
     const fetchDepartmentDetails = async () => {
       if (departmentId) {
         try {
-          // Check if departmentId is a valid ObjectId before making the API call
-          if (!mongoose.Types.ObjectId.isValid(departmentId)) {
-            setError('Invalid department ID');
-            return;
-          }
-
-          const response = await axios.get(
-            `http://localhost:3000/api/departments/departments/${departmentId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
-            }
-          );
+          const response = await axios.get(`http://localhost:3000/api/departments/departments/${departmentId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
           const departmentData = response.data.department;
           setFormData({
             departmentName: departmentData.departmentName || '',
@@ -83,7 +73,6 @@ const BasicInformation = ({ departmentId }) => {
     fetchDepartmentDetails();
   }, [departmentId]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -101,38 +90,34 @@ const BasicInformation = ({ departmentId }) => {
     }
 
     const apiUrl = departmentId
-      ? `http://localhost:3000/api/departments/departments/${departmentId}` // Use PUT for updating
-      : `http://localhost:3000/api/departments`; // Use POST for creating
-
-    const method = departmentId ? "PUT" : "POST";  // PUT if departmentId exists (update), POST if creating
+      ? `http://localhost:3000/api/departments/departments/${departmentId}`
+      : 'http://localhost:3000/api/departments';  // for new department
 
     try {
       const response = await fetch(apiUrl, {
-        method, // PUT or POST depending on the departmentId
+        method: departmentId ? 'PUT' : 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
           collegeId: collegeId,
+          departmentId: departmentId,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit data");
+        throw new Error('Failed to submit data');
       }
 
       const result = await response.json();
-      alert("Department information saved successfully");
+      alert('Department information saved successfully');
       setIsSaved(true);
-      setFormData(result.department);
+      setFormData(result.department); // Set form data with the saved department
     } catch (error) {
-      setError("Error saving information: " + error.message);
+      setError('Error saving information: ' + error.message);
     }
   };
-
-
-
 
   const handleEdit = () => {
     setIsSaved(false); // Allow editing again
