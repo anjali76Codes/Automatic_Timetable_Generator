@@ -1,3 +1,4 @@
+
 import { Department } from "../models/department.models.js";
 import { College } from "../models/college.models.js";
 import mongoose from "mongoose";
@@ -6,12 +7,10 @@ import mongoose from "mongoose";
 export const createDepartment = async (req, res) => {
   const { departmentId, departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents, collegeId } = req.body;
 
-  // Prevent updating a department after it is created
   if (departmentId) {
-    return res.status(400).json({ message: "Department already created, cannot be updated" });
+    return res.status(400).json({ message: "Department already exists, cannot update" });
   }
 
-  // Normal department creation logic
   try {
     let department = await Department.findOne({ departmentName, collegeId });
 
@@ -25,7 +24,7 @@ export const createDepartment = async (req, res) => {
       totalFaculties,
       totalClasses,
       totalLabs,
-      totalStudents,  // Include totalStudents
+      totalStudents,
     });
 
     await newDepartment.save();
@@ -41,12 +40,15 @@ export const createDepartment = async (req, res) => {
 };
 
 
-
-
 export const getDepartment = async (req, res) => {
   const { departmentId } = req.params; // Get departmentId from URL parameters
 
   try {
+    // Cast departmentId to ObjectId to ensure it's the correct type
+    if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+      return res.status(400).json({ message: "Invalid department ID" });
+    }
+
     // Find the department by ID
     const department = await Department.findById(departmentId);
 
@@ -61,7 +63,6 @@ export const getDepartment = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 // In your departmentController.js file
 
@@ -113,43 +114,32 @@ export const getDepartmentDetails = async (req, res) => {
   }
 };
 
-
-
-// Controller to update department information
 export const updateDepartment = async (req, res) => {
-  const { departmentId } = req.params;
-  const { departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents } = req.body;
+  const { departmentId, departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents, collegeId } = req.body;
 
-  // Check if the departmentId is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
-    return res.status(400).json({ message: "Invalid department ID" });
+  if (!departmentId || !departmentName || !departmentHOD || !totalFaculties || !totalClasses || !totalLabs || !totalStudents || !collegeId) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
 
   try {
-    // Find the department by ID
-    let department = await Department.findById(departmentId);
+    const department = await Department.findById(departmentId);
 
-    // If department is not found
     if (!department) {
-      return res.status(404).json({ message: "Department not found" });
+      return res.status(404).json({ error: 'Department not found' });
     }
 
-    // Update department fields
-    department.departmentName = departmentName || department.departmentName;
-    department.departmentHOD = departmentHOD || department.departmentHOD;
-    department.totalFaculties = totalFaculties || department.totalFaculties;
-    department.totalClasses = totalClasses || department.totalClasses;
-    department.totalLabs = totalLabs || department.totalLabs;
-    department.totalStudents = totalStudents || department.totalStudents;
+    department.departmentName = departmentName;
+    department.departmentHOD = departmentHOD;
+    department.totalFaculties = totalFaculties;
+    department.totalClasses = totalClasses;
+    department.totalLabs = totalLabs;
+    department.totalStudents = totalStudents;
+    department.collegeId = collegeId;
 
-    // Save the updated department
     await department.save();
 
-    // Return the updated department details
-    res.status(200).json({ message: "Department updated successfully", department });
+    return res.status(200).json({ message: 'Department updated successfully', department });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to update department", error: error.message });
+    res.status(500).json({ error: 'Error updating department' });
   }
 };
-
