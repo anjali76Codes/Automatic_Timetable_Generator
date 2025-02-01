@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const BasicInformation = ({ departmentId }) => {
+const BasicInformation = ({ departmentId, departmentName }) => {
   const [formData, setFormData] = useState({
-    departmentName: '',
+    departmentName: departmentName,
     departmentHOD: '',
     totalFaculties: '',
     totalClasses: '',
@@ -12,12 +12,13 @@ const BasicInformation = ({ departmentId }) => {
     totalStudents: '',
   });
   const [collegeId, setCollegeId] = useState(null);
+  const [collegeCode, setCollegeCode] = useState(null); // Store college code
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
   const [departmentDetails, setDepartmentDetails] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch College ID
+  // Fetch College ID and Code
   useEffect(() => {
     const token = localStorage.getItem('token');
     const fetchCollegeId = async () => {
@@ -31,7 +32,13 @@ const BasicInformation = ({ departmentId }) => {
           },
         });
         if (response.data && response.data.colleges && response.data.colleges.length > 0) {
-          setCollegeId(response.data.colleges[0]);
+          const college = response.data.colleges[0];
+          setCollegeId(college);
+          const collegeResponse = await axios.get(
+            `http://localhost:3000/api/v1/timetable/colleges/${college}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setCollegeCode(collegeResponse.data.collegeCode);
         } else {
           throw new Error('No college found for the user');
         }
@@ -87,24 +94,28 @@ const BasicInformation = ({ departmentId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!collegeId) {
-      setError('College ID is missing');
+    if (!collegeId || !collegeCode) {
+      setError('College ID or Code is missing');
       return;
     }
 
-    const apiUrl = "http://localhost:3000/api/departments";
-    const departmentId = isSaved ? formData.departmentId : null;
+
+
+    const apiUrl = departmentDetails ? `http://localhost:3000/api/departments/departments/${departmentId}` : "http://localhost:3000/api/departments";
+    const method = departmentDetails ? "PUT" : "POST"; // Use PUT if the department already exists
+    const departmentIdFromDetails = departmentDetails ? departmentDetails.departmentId : null;
+
 
     try {
       const response = await fetch(apiUrl, {
-        method: departmentId ? "PUT" : "POST",
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
           collegeId: collegeId,
-          departmentId: departmentId,
+          departmentId: departmentIdFromDetails,  // Use the new variable name
         }),
       });
 
@@ -116,10 +127,15 @@ const BasicInformation = ({ departmentId }) => {
       alert("Department information saved successfully");
       setIsSaved(true);
       setFormData(result.department);
+      setDepartmentDetails(result.department); // Update department details
+
+      // After saving, redirect to departments/collegeCode
+      navigate(`/departments/${collegeCode}`);
     } catch (error) {
       setError("Error saving information: " + error.message);
     }
   };
+
 
   const handleEdit = () => {
     setIsSaved(false); // Allow editing again
@@ -151,8 +167,8 @@ const BasicInformation = ({ departmentId }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-white p-5 rounded-xl shadow-xl">
-      <h2 className="text-2xl font-bold text-gray-800 mb-3 text-center text-gradient">Basic Information</h2>
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center text-gradient">Basic Information</h2>
 
       <div className="grid grid-cols-2 gap-6">
         <div className="col-span-1">
@@ -163,12 +179,12 @@ const BasicInformation = ({ departmentId }) => {
             type="text"
             id="departmentName"
             name="departmentName"
-            value={formData.departmentName}
+            value={departmentName}
             onChange={handleChange}
             className="w-full px-5 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Enter department name"
             required
-            disabled={isSaved} // Disable input after save
+            disabled={isSaved || true} // Disable input after save
           />
         </div>
         <div className="col-span-1">
