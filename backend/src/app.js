@@ -48,7 +48,7 @@ app.use("/api/v1/testing", testingRouter);
 app.use("/api/v1/timetable", collegeRouter);
 app.use("/api", userRouter);
 // Routes
-app.use("/api/departments", departmentRoutes);
+app.use("/api/departments", departmentRoutes);  
 app.use("/api/v1/subject", subjectRouter);
 
 // once we have /testing, entire control is handled by testingRouter
