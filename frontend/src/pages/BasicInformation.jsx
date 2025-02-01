@@ -12,13 +12,12 @@ const BasicInformation = ({ departmentId }) => {
     totalStudents: '',
   });
   const [collegeId, setCollegeId] = useState(null);
-  const [collegeCode, setCollegeCode] = useState(null); // Store college code
   const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
   const [departmentDetails, setDepartmentDetails] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch College ID and Code
+  // Fetch College ID
   useEffect(() => {
     const token = localStorage.getItem('token');
     const fetchCollegeId = async () => {
@@ -32,13 +31,7 @@ const BasicInformation = ({ departmentId }) => {
           },
         });
         if (response.data && response.data.colleges && response.data.colleges.length > 0) {
-          const college = response.data.colleges[0];
-          setCollegeId(college);
-          const collegeResponse = await axios.get(
-            `http://localhost:3000/api/v1/timetable/colleges/${college}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setCollegeCode(collegeResponse.data.collegeCode);
+          setCollegeId(response.data.colleges[0]);
         } else {
           throw new Error('No college found for the user');
         }
@@ -94,18 +87,17 @@ const BasicInformation = ({ departmentId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!collegeId || !collegeCode) {
-      setError('College ID or Code is missing');
+    if (!collegeId) {
+      setError('College ID is missing');
       return;
     }
 
-    const apiUrl = departmentDetails ? `http://localhost:3000/api/departments/${departmentId}` : "http://localhost:3000/api/departments";
-    const method = departmentDetails ? "PUT" : "POST"; // Use PUT if the department already exists
-    const departmentId = departmentDetails ? departmentDetails.departmentId : null;
+    const apiUrl = "http://localhost:3000/api/departments";
+    const departmentId = isSaved ? formData.departmentId : null;
 
     try {
       const response = await fetch(apiUrl, {
-        method: method,
+        method: departmentId ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -124,10 +116,6 @@ const BasicInformation = ({ departmentId }) => {
       alert("Department information saved successfully");
       setIsSaved(true);
       setFormData(result.department);
-      setDepartmentDetails(result.department); // Update department details
-
-      // After saving, redirect to departments/collegeCode
-      navigate(`/departments/${collegeCode}`);
     } catch (error) {
       setError("Error saving information: " + error.message);
     }
@@ -163,8 +151,8 @@ const BasicInformation = ({ departmentId }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center text-gradient">Basic Information</h2>
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto bg-white p-5 rounded-xl shadow-xl">
+      <h2 className="text-2xl font-bold text-gray-800 mb-3 text-center text-gradient">Basic Information</h2>
 
       <div className="grid grid-cols-2 gap-6">
         <div className="col-span-1">

@@ -9,6 +9,7 @@ const Departments = () => {
   const [departmentDetails, setDepartmentDetails] = useState({});
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Loading state for departments
+  const [newDepartmentNames, setNewDepartmentNames] = useState({}); // For adding department names
 
   useEffect(() => {
     // Fetching college details using the collegeCode from the URL
@@ -68,6 +69,18 @@ const Departments = () => {
     navigate(`/basic-info/${departmentId}`, { state: { departmentName } });
   };
 
+  const handleSaveDepartmentName = (departmentId) => {
+    // Save the new department name to departmentDetails
+    setDepartmentDetails((prevDetails) => ({
+      ...prevDetails,
+      [departmentId]: {
+        ...prevDetails[departmentId],
+        departmentName: newDepartmentNames[departmentId] || `Department ${departmentId}`,
+      },
+    }));
+    setNewDepartmentNames((prev) => ({ ...prev, [departmentId]: "" })); // Clear input field
+  };
+
   const totalDepartments = collegeDetails.totalDepartments || 0;
   const departments = collegeDetails.collegeDepartments || [];
 
@@ -79,8 +92,8 @@ const Departments = () => {
     filledDepartments.push(`Department ${i + 1}`); // Add default names like "Department 1", "Department 2", etc.
   }
 
-  const handleAddInfoClick = (departmentId, index) => {
-    const department = departmentDetails[departmentId] || { departmentName: `Department ${index + 1}` }; // Fallback to dynamic name
+  const handleAddInfoClick = (departmentId) => {
+    const department = departmentDetails[departmentId] || { departmentName: `Department ${departmentId}` }; // Fallback to dynamic name
     // Navigating to the department details page with the correct URL
     navigate(`/departments/${collegeCode}/${departmentId}`, {
       state: { departmentName: department.departmentName }, // Pass the department name to the next page
@@ -133,18 +146,40 @@ const Departments = () => {
                   key={index}
                   className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center"
                 >
-                  <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                    {department.departmentName}
-                  </h3>
-                  <button
-                    onClick={() => handleAddInfoClick(departmentId, index)}
-                    className={`mt-4 ${departmentDetails[departmentId]
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-blue-600 hover:bg-blue-700"
-                      } text-white px-6 py-2 rounded-lg font-bold transition`}
-                  >
-                    {departmentDetails[departmentId] ? "View Details" : "Add Info"}
-                  </button>
+                  {departmentDetails[departmentId] ? (
+                    <>
+                      <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                        {department.departmentName}
+                      </h3>
+                      <button
+                        onClick={() => handleAddInfoClick(departmentId)}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold transition"
+                      >
+                        Fill Details
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Enter Department Name"
+                        value={newDepartmentNames[departmentId] || ""}
+                        onChange={(e) =>
+                          setNewDepartmentNames((prev) => ({
+                            ...prev,
+                            [departmentId]: e.target.value,
+                          }))
+                        }
+                        className="mb-4 p-2 border border-gray-300 rounded-lg w-full"
+                      />
+                      <button
+                        onClick={() => handleSaveDepartmentName(departmentId)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition"
+                      >
+                        Save
+                      </button>
+                    </>
+                  )}
                 </div>
               );
             })

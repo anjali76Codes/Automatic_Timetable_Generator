@@ -7,10 +7,12 @@ import mongoose from "mongoose";
 export const createDepartment = async (req, res) => {
   const { departmentId, departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents, collegeId } = req.body;
 
+  // Prevent updating a department after it is created
   if (departmentId) {
-    return res.status(400).json({ message: "Department already exists, cannot update" });
+    return res.status(400).json({ message: "Department already created, cannot be updated" });
   }
 
+  // Normal department creation logic
   try {
     let department = await Department.findOne({ departmentName, collegeId });
 
@@ -24,7 +26,7 @@ export const createDepartment = async (req, res) => {
       totalFaculties,
       totalClasses,
       totalLabs,
-      totalStudents,
+      totalStudents,  // Include totalStudents
     });
 
     await newDepartment.save();
@@ -40,23 +42,23 @@ export const createDepartment = async (req, res) => {
 };
 
 
+
+
 export const getDepartment = async (req, res) => {
-  const { departmentId } = req.params; // Get departmentId from URL parameters
+  const { departmentId } = req.params;
+
+  // Check if the departmentId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+    return res.status(400).json({ message: "Invalid department ID" });
+  }
 
   try {
-    // Cast departmentId to ObjectId to ensure it's the correct type
-    if (!mongoose.Types.ObjectId.isValid(departmentId)) {
-      return res.status(400).json({ message: "Invalid department ID" });
-    }
-
-    // Find the department by ID
     const department = await Department.findById(departmentId);
 
     if (!department) {
       return res.status(404).json({ message: "Department not found" });
     }
 
-    // Return the department data
     res.status(200).json({ department });
   } catch (error) {
     console.error(error);
@@ -114,32 +116,39 @@ export const getDepartmentDetails = async (req, res) => {
   }
 };
 
-export const updateDepartment = async (req, res) => {
-  const { departmentId, departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents, collegeId } = req.body;
 
-  if (!departmentId || !departmentName || !departmentHOD || !totalFaculties || !totalClasses || !totalLabs || !totalStudents || !collegeId) {
-    return res.status(400).json({ error: 'All fields are required' });
+
+
+
+// Controller to update department information
+export const updateDepartment = async (req, res) => {
+  const { departmentId } = req.params;
+  const { departmentName, departmentHOD, totalFaculties, totalClasses, totalLabs, totalStudents } = req.body;
+
+  // Check if the departmentId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+    return res.status(400).json({ message: "Invalid department ID" });
   }
 
   try {
-    const department = await Department.findById(departmentId);
+    let department = await Department.findById(departmentId);
 
     if (!department) {
-      return res.status(404).json({ error: 'Department not found' });
+      return res.status(404).json({ message: "Department not found" });
     }
 
-    department.departmentName = departmentName;
-    department.departmentHOD = departmentHOD;
-    department.totalFaculties = totalFaculties;
-    department.totalClasses = totalClasses;
-    department.totalLabs = totalLabs;
-    department.totalStudents = totalStudents;
-    department.collegeId = collegeId;
+    department.departmentName = departmentName || department.departmentName;
+    department.departmentHOD = departmentHOD || department.departmentHOD;
+    department.totalFaculties = totalFaculties || department.totalFaculties;
+    department.totalClasses = totalClasses || department.totalClasses;
+    department.totalLabs = totalLabs || department.totalLabs;
+    department.totalStudents = totalStudents || department.totalStudents;
 
     await department.save();
 
-    return res.status(200).json({ message: 'Department updated successfully', department });
+    res.status(200).json({ message: "Department updated successfully", department });
   } catch (error) {
-    res.status(500).json({ error: 'Error updating department' });
+    console.error(error);
+    res.status(500).json({ message: "Failed to update department", error: error.message });
   }
 };
